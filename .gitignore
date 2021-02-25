@@ -1,6 +1,5 @@
-
+#specific for this folder
 Backup/
-*.Rproj
 .DS_Store
 
 # History files
@@ -9,6 +8,7 @@ Backup/
 
 # Session Data files
 *.RData
+*.Rproj
 
 # User-specific files
 .Ruserdata
@@ -43,3 +43,4 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
