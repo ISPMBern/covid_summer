@@ -18,7 +18,7 @@ library(reshape2)
 set.seed(60321)
 
 # COVID-19 cases observed in Summer (Jun-Sep) 2020 in Switzerland
-setwd("/Users/mr19m223/Documents/COVID_projects/Epidemic_Su2020/StochasticModel_SarsCoV2/su2020_cov2")
+setwd("/Users/mr19m223/Documents/COVID_projects/Epidemic_Su2020/covid_summer")
 
 # Prepare and load data
 #####
@@ -250,7 +250,7 @@ growth_summary <- function(growth_r_all){
   for (I in 1:length(imports_d)) {
     for (k in 1:length(dispersion_parameters)) {
       for (R in 1:length(Re_all)) {
-        m <- (I-1)*length(dispersion_parameters)*length(Re_all)+(k-1)*length(Re_all)+R-1+1
+        m <- (I-1)*length(dispersion_parameters)*length(Re_all)+(k-1)*length(Re_all)+R
         growth_r_all_summary[m,2] <- quantile(growth_r_all[[I]][[k]][,R])[3]
         growth_r_all_summary[m,3] <- quantile(growth_r_all[[I]][[k]][,R])[2]
         growth_r_all_summary[m,4] <- quantile(growth_r_all[[I]][[k]][,R])[4]
@@ -276,7 +276,7 @@ cum_cases_function <- function(all_cases){
   for (k in 1:length(dispersion_parameters)) {
     for (R in 1:length(Re_all)) {
       for (i in 1:runs) {
-          m <- (I-1)*length(dispersion_parameters)*length(Re_all)+(k-1)*length(Re_all)+R-1+1
+          m <- (I-1)*length(dispersion_parameters)*length(Re_all)+(k-1)*length(Re_all)+R
           cum_cases[m,i] <- as.numeric(sum(all_cases[[I]][[k]][[R]][,i]))
         }
       }
@@ -304,7 +304,7 @@ final_cases_function <- function(all_cases){
     for (k in 1:length(dispersion_parameters)) {
       for (R in 1:length(Re_all)) {
         for (i in 1:runs) {
-          m <- (I-1)*length(dispersion_parameters)*length(Re_all)+(k-1)*length(Re_all)+R-1+1
+          m <- (I-1)*length(dispersion_parameters)*length(Re_all)+(k-1)*length(Re_all)+R
           final_size[m,i] <- all_cases[[I]][[k]][[R]][length(max_time),i]
         }
       }
@@ -332,20 +332,53 @@ col <- wes_palette("Royal2", 12, type = c( "continuous"))
 
 ## Visualize probability of stochastic extinction, q
 #####
-generation_time * 3* sigma
-P_extinction <- function(R,n,k){
-  p_ext <- as.numeric(1/(R)^n)
-  ifelse(p_ext < 1, p_ext, 1)
+generation_time_99 <- round(generation_time + 3* sigma)# if at least 14 days of 0 cases than extinction
+extinction_cases <- as.data.frame(matrix(0,nrow = length(Re_all)*length(dispersion_parameters), ncol = runs))
+
+extiction_function <- function(all_cases){
+    for (k in 1:length(dispersion_parameters)) {
+      for (R in 1:length(Re_all)) {
+        for (i in 1:runs) {
+          m <- length(Re_all)*(k-1) + R
+          extinction_cases[m,i] <- sum(all_cases[[1]][[k]][[R]][(length(max_time)-generation_time_99):length(max_time),i])# I=1, 0 imports
+        }
+      }
+    }
+  extinction_cases[,"P_ext"] <- as.numeric(rowSums(extinction_cases==0)/runs)
+  # legend for "extinction_cases"
+  extinction_cases[,c("dispersion_parameter","Re")]<- NA
+  extinction_cases <- extinction_cases[,c("dispersion_parameter","Re", "P_ext")]
+  extinction_cases[,1] <- as.character(rep(dispersion_parameters , each = length(Re_all)))
+  extinction_cases[,2] <- as.character(rep(Re_all,length(dispersion_parameters)))
+  return(extinction_cases)
 }
-Rei <- seq(0.0001, 2, by=1e-5)
-ni <- c(25, 50, 75)
+extinct_epidemics <- extiction_function(all_cases_imports_infect)
 
-p_ext <- mapply(P_extinction, list(Rei), ni, dispersion_parameters[2])
+pdf(file=paste0("P_extinction_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 4, width =6)
 
-plot(Rei, p_ext[,2],xlim = c(0,2),col=cols[1], type="l", lty=1, lwd=2,las=1, xlab=bquote(italic("R"["e"])), ylab="Probability of stochastic extinction", frame=FALSE)
-polygon(c(Rei, rev(Rei)), c(p_ext[,1], rev(p_ext[,3])),
-        col=alpha(cols[1],0.5), border = NA)
-#matplot(Rei, res, col=cols, type="l", lty=1, lwd=2, xlab="x", ylab="result")
+plot(NA, type = "n", xlim =c(min(Re_all),max(Re_all)), ylim = c(0, 1),frame = FALSE, las=1,
+     xlab = bquote("Effective reproduction number" ~ italic("R"["e"])), 
+     ylab = bquote("Probability of stochastic extinction" ~ italic("P")))
+
+for(ki in 1:length(dispersion_parameters)){
+  k <- dispersion_parameters[ki]
+  R <-extinct_epidemics$Re[extinct_epidemics$dispersion_parameter==k]
+  P_ext <-extinct_epidemics$P_ext[extinct_epidemics$dispersion_parameter==k]
+  
+  spline_int <- as.data.frame(spline(R, P_ext),col.names = c("R","P_ext"))
+  if(sum(spline_int$P_ext<=0)>1){spline_int[c(min(which(spline_int$P_ext<=0)):length(spline_int$P_ext)),"P_ext"] <- 0}
+  if(sum(spline_int$P_ext>=1)>1){spline_int[c(1:max(which(spline_int$P_ext>=1))),"P_ext"] <- 1}
+  spline_int <- as.data.frame(spline(spline_int$R, spline_int$P_ext),col.names = c("R","P_ext"))
+  
+  points(R, P_ext, col=cols[ki], pch=20)
+  lines(spline_int, col=cols[ki])
+}
+legend(1,1, title=mtext(bquote("Dispersion parameter" ~ italic("k:")),at=1.1) , legend=c(dispersion_parameters),
+      fill=c(cols[1:length(dispersion_parameters)]), cex=1,bty = "n", border = F)
+
+dev.off()
+
+
 #####
 
 
