@@ -1,11 +1,10 @@
 
-#Stochastic branching model
+# Stochastic branching model
 ## SARS-CoV2 in Switzerland during Summer 2020
 ### M Reichmuth, February 2021
 
 #library
-library(tiff)
-library(eps)
+#library(eps)
 library(ggplot2)
 library(MASS)
 library(ggpubr)
@@ -13,7 +12,8 @@ library(grid)
 library(gridExtra)
 library(wesanderson)
 library(lubridate)
-library(reshape2)
+#library(reshape2)
+
 # Set seed
 set.seed(60321)
 
@@ -52,6 +52,47 @@ paste0("In total ", length(BAG_data_su2020$fall_dt), " cases were reported by th
        " cases, it was stated if infection occured aboard or in Switzerland. The ratio of international and national transmission was ",
        length(subset(BAG_data_su2020$fall_dt, BAG_data_su2020$exp_ort %in% c(2,3))),"/", length(subset(BAG_data_su2020$fall_dt, BAG_data_su2020$exp_ort %in% c(1))),
        " (", round(length(subset(BAG_data_su2020$fall_dt, BAG_data_su2020$exp_ort %in% c(2,3)))/length(subset(BAG_data_su2020$fall_dt, BAG_data_su2020$exp_ort %in% c(1)))*100,2) ,"%).")
+
+# rename countries where exports
+Fun_translate_countries <- function(x){
+    if(is.na(x)){return("Unknown")}
+    else if(x== "Frankreich"){return("France")}
+    else if(x== "Kroatien"){return("Croatia")}
+    else if(x== "Kosovo"){return("Kosovo")}
+    else if(x== "Italien"){return("Italy")}
+    else if(x== "Deutschland"){return("Germany")}
+    else if(x== "Türkei"){return("Turkey")}
+    else if(x== "Serbien"){return("Serbia")}
+    else if(x== "Spanien"){return("Spain")}
+    else if(x== "Malta"){return("Malta")}
+    else if(x== "Griechenland"){return("Greece")}
+    else if(x== "Portugal"){return("Portugal")}
+    else if(x== "Österreich"){return("Austria")}
+    else if(x== "Mazedonien"){return("North Macedonia")}
+    else if(x== "Bosnien und Herzegowina"){return("Bosnia and Herzegovina")}
+    else if(x== "Albanien"){return("Albania")}
+    else if(x== "Ungarn"){return("Hungary")}
+    else if(x== "Niederlande"){return("Netherlands")}
+    else if(x== "Polen"){return("Poland")}
+    else if(x== "Tschechien"){return("Czech Republic")}
+    else if(x== "Rumänien"){return("Romania")}
+    else if(x== "Slowenien"){return("Slovenia")}
+    else if(x== "Vereinigtes Königreich"){return("UK")}
+    else if(x== "Schweiz"){return("Switzerland")}
+    else if(x== ""){return("Unknown")}
+    else {return("Others")} 
+  }
+BAG_data_su2020$country <- sapply(BAG_data_su2020$exp_land, Fun_translate_countries)
+BAG_data_su2020$country[BAG_data_su2020$exp_ort==1] <-"Switzerland"
+BAG_data_su2020$date <- BAG_data_su2020$fall_dt
+
+Fun_age_cat <- function(x){
+  if(is.na(x)){return("Unknown")}
+  else if(x<=15 | x>30 &x<=45){return("Adults & families")}
+  else if(x>15 &x<=30){return("Adolescents & young adults")}
+  else {return("Older adults")} 
+}
+BAG_data_su2020$age_cat <- sapply(BAG_data_su2020$altersjahr, Fun_age_cat)
 
 #####
 
@@ -329,6 +370,144 @@ final_cases_imports <- final_cases_function(all_cases_imports)
 #Plots:
 cols1 <- wes_palette("GrandBudapest2", length(Re_all)+2, type = c( "continuous"))
 col <- wes_palette("Royal2", 12, type = c( "continuous"))
+cols_country  <- wes_palette("GrandBudapest2",length(unique(BAG_data_su2020$age_cat)), type = c( "discrete"))
+## Visualize reported imports (for time of interest and by countries) and age?
+#####
+
+#plot only swiss cases, plot imported, plot all, plot swiss+ unknown
+swiss_cases_su2020$imports_frac <- swiss_cases_su2020$cases_abroad/(swiss_cases_su2020$cases_abroad+swiss_cases_su2020$cases_swiss)
+BAG_data_su2020$country = factor(BAG_data_su2020$country, levels=unique(names(table(BAG_data_su2020$country))[order(table(BAG_data_su2020$country), decreasing = TRUE)]), ordered=TRUE)
+BAG_data_su2020$country <- factor(BAG_data_su2020$country, levels=c(levels(BAG_data_su2020$country)[!levels(BAG_data_su2020$country) %in% c("Others","Unknown")],c("Others","Unknown")), ordered=TRUE)
+
+label <- data.frame(
+  start_date = c(as_date("2020-06-15"),as_date("2020-06-25"),as_date("2020-08-01"), as_date("2020-06-15")), 
+  end_date = c(as_date("2020-09-30"),as_date("2020-09-30"),as_date("2020-09-15"), as_date("2020-08-30")), 
+  end_date_dot = c(as_date(format(Sys.time(), "%Y-%m-%d")),as_date(format(Sys.time(), "%Y-%m-%d")),as_date("2020-09-15"), as_date("2020-08-30")), 
+  label = c("Open boarders:","Swiss Covid App:", "University breaks*:", "School breaks*:"))
+label$label <- factor(label$label, levels= label$label, ordered=TRUE)
+
+p_regulation <- ggplot() +
+  geom_segment(data=label, aes(x=start_date, xend=end_date, y=label, yend=label),col= c("#536475"), linetype=1, size=1) +
+  geom_point(data=label,aes(x=start_date,y=label),col= c("#536475"), size=2)+
+  geom_point(data=label,aes(x=end_date_dot, y=label),col= c("#536475"), size=2)+
+  scale_x_date(date_breaks = "1 month", 
+               date_labels = "%d-%b",
+               limits = as_date(c(time_window[1],time_window[2])))+
+  theme(plot.margin = margin(8, 10, 0, 2, "mm"),
+        panel.background = element_rect(fill = "transparent"), # bg of the panel
+        plot.background = element_rect(fill = "transparent", color = NA), # bg of the plot
+        legend.background = element_rect(fill = "transparent", color = NA), # get rid of legend bg
+        legend.box.background = element_rect(fill = "transparent", color = NA),# get rid of legend panel bg
+        panel.grid.major = element_blank(), # get rid of major grid
+        panel.grid.minor = element_blank(), # get rid of minor grid
+        axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_text(color="transparent"),#angle = -20),
+        axis.text.y = element_text(size = 12))+
+  labs(x = "", y =bquote(""))
+
+p_cases <- ggplot(swiss_cases_su2020, aes(x=date,width=1))+
+  geom_bar(aes(y=cases_reported),position="identity", stat = "identity", fill=cols[1], alpha = 0.6)+
+  geom_bar(aes(y=cases_abroad),stat = "identity", position = "identity", fill=cols[2], alpha = 0.8)+
+  theme_classic()+
+  ylim(0, 600)+
+  scale_x_date(date_labels = "%d-%b")+
+  theme(plot.margin = margin(0, 10, 2, 30, "mm"),
+        panel.background = element_rect(fill = "transparent"), # bg of the panel
+        plot.background = element_rect(fill = "transparent", color = NA), # bg of the plot
+        legend.background = element_rect(fill = "transparent", color = NA), # get rid of legend bg
+        legend.box.background = element_rect(fill = "transparent", color = NA),# get rid of legend panel bg
+        panel.grid.major = element_blank(), # get rid of major grid
+        panel.grid.minor = element_blank(), # get rid of minor grid
+        axis.text.x = element_text(size = 12),#angle = -20),
+        axis.text.y = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        text = element_text(size =rel(3.5)),
+        legend.text= element_text(size = 12),
+        plot.title = element_text( size = 16, face = "bold", hjust = 0),
+        plot.tag = element_text( size = 16, face = "bold", hjust = 0),
+        plot.subtitle = element_text( size = 12, face = "bold", hjust = 0))+
+  labs(x = "", y =bquote("Reported cases"))
+
+
+grid.newpage()
+plot_regulation_cases_reported <- grid.arrange(rbind(ggplotGrob(p_regulation), ggplotGrob(p_cases), size = "last"))
+ggsave(plot_regulation_cases_reported, filename = paste0("../Figures/regulation_cases_reported",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 6, width = 8,  bg = "transparent")
+
+
+plot(swiss_cases_su2020$imports_frac ~swiss_cases_su2020$date,
+     type = "h", xlim =c(time_window[1],time_window[2]), ylim = c(0, 1),xaxt="n",
+     xlab = NA, ylab = "", frame = FALSE, las=2,col=cols[1])
+axis.Date(1, at=seq(min(time_window), max(time_window+1), by="months"), format="%d-%b")
+
+for(i in 1:2){
+  p_import <-list()
+  for(c in unname(levels(BAG_data_su2020$country))){
+    if(i==1){
+      max_y <-1
+      pos_fill <- "fill"
+    }
+    if(i==2){
+      if(c %in% c("Switzerland", "Unknown")){
+        max_y <- 350
+        }
+      if(!c %in% c("Switzerland", "Unknown")){
+        max_y <- 50
+      } 
+      pos_fill <- "stack"
+    }
+    countries <- BAG_data_su2020[BAG_data_su2020$country %in% c,]
+    if(c %in% "Switzerland" & i==2){
+      legend_pos <- "right"
+    }
+    else{  legend_pos <- "none"}
+  p_import[[c]] <- ggplot(countries[,c("date", "country","age_cat")], aes(x=date)) +
+    #geom_bar(aes(fill = age_cat), position = "stack") 
+    geom_histogram(aes(fill= age_cat), 
+                   position = pos_fill,binwidth = 1, alpha = 0.6)+
+    theme_classic()+
+    scale_x_date(date_labels = "%d-%b",date_breaks = "1 month", limits = c(time_window[1], time_window[2]))+
+    #scale_color_manual(values ="transparent")+
+    scale_fill_manual(values =cols_country)+
+    labs(x = "", y ="",subtitle =c)+
+    theme(plot.margin = margin(8, 2, 2, 2, "mm"),
+          panel.background = element_rect(fill = "transparent"), # bg of the panel
+          plot.background = element_rect(fill = "transparent", color = NA), # bg of the plot
+          legend.background = element_rect(fill = "transparent", color = NA), # get rid of legend bg
+          legend.box.background = element_rect(fill = "transparent", color = NA),# get rid of legend panel bg
+          panel.grid.major = element_blank(), # get rid of major grid
+          panel.grid.minor = element_blank(), # get rid of minor grid
+          axis.text.x = element_text(size = 5),#angle = -20),
+          axis.text.y = element_text(size = 5),
+          axis.title.y = element_text(size = 5),
+          text = element_text(size =rel(3.5)),
+          legend.key = element_rect(colour = "transparent", fill = "transparent"),
+          legend.title = element_text(color = "transparent", size = 2),
+          legend.text = element_text(size = 5),
+          legend.position = legend_pos)+
+    scale_color_manual(name="Categories")+
+    guides(colour = guide_legend(override.aes = list(size=2)))+
+    scale_y_continuous(limits = c(0, max_y))
+}
+  if(i==1){
+    p_import_proportion <- p_import
+  }
+}
+
+p_import[[3]] <-grobTree(grid.arrange(p_import[[3]]),textGrob(bquote("Number of reported cases"), x = 0.03, y = 0.5, rot=90))
+p_import_proportion[[3]] <-grobTree(grid.arrange(p_import_proportion[[3]]),textGrob(bquote("Age categories"), x = 0.03, y = 0.5, rot=90))
+
+
+plot_countries <- grid.arrange(grobs = p_import[1:length(levels(BAG_data_su2020$country))],layout_matrix =  matrix(1:25,5,5))
+plot_countries1 <- grid.arrange(grobs = p_import_proportion[1:length(levels(BAG_data_su2020$country))],layout_matrix =  matrix(1:25,5,5))
+plot_countries <- grobTree(plot_countries,textGrob(bquote("a)"), x = 0.02, y = 0.98))
+plot_countries1 <-grobTree(plot_countries1,textGrob(bquote("b)"), x = 0.02, y = 0.98))
+plot_countries <- grid.arrange(plot_countries,plot_countries1,layout_matrix = matrix(1:2,2,1))
+
+ggsave(plot_countries, filename = paste0("../Figures/imports_per_country_day_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 16, width = 14,  bg = "transparent")
+
+
+#####
 
 ## Visualize probability of stochastic extinction, q
 #####
