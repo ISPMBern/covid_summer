@@ -1,0 +1,40 @@
+\begin{thebibliography}{1}
+
+\bibitem{russell_effect_2021}
+Russell TW, Wu JT, Clifford S, Edmunds WJ, Kucharski AJ, Jit M.
+\newblock Effect of internationally imported cases on internal spread of
+  {COVID}-19: a mathematical modelling study;6(1):e12--e20.
+\newblock Available from:
+  \url{https://linkinghub.elsevier.com/retrieve/pii/S2468266720302632}.
+
+\bibitem{hodcroft_emergence_2020}
+Hodcroft EB, Zuber M, Nadeau S, Crawford KHD, Bloom JD, Veesler D, et~al..
+  Emergence and spread of a {SARS}-{CoV}-2 variant through Europe in the summer
+  of 2020 [preprint];.
+\newblock Available from:
+  \url{http://medrxiv.org/lookup/doi/10.1101/2020.10.25.20219063}.
+
+\bibitem{svensson2007note}
+Svensson {\AA}.
+\newblock A note on generation times in epidemic models.
+\newblock Mathematical biosciences. 2007;208(1):300--311.
+
+\bibitem{ganyani_estimating_2020}
+Ganyani T, Kremer C, Chen D, Torneri A, Faes C, Wallinga J, et~al.
+\newblock Estimating the generation interval for coronavirus disease
+  ({COVID}-19) based on symptom onset data, March 2020;25(17).
+\newblock Available from:
+  \url{https://www.eurosurveillance.org/content/10.2807/1560-7917.ES.2020.25.17.2000257}.
+
+\bibitem{r_core_team_r_2020}
+{R Core Team}. R: A Language and Environment for Statistical Computing. R
+  Foundation for Statistical Computing;.
+\newblock Available from: \url{https://www.R-project.org/}.
+
+\bibitem{venables_modern_2002}
+Venables WN, Ripley BD, Venables WN.
+\newblock Modern applied statistics with S.
+\newblock 4th ed. Statistics and computing. Springer;.
+\newblock {OCLC}: ocm49312402.
+
+\end{thebibliography}
