@@ -88,7 +88,7 @@ BAG_data_su2020$date <- BAG_data_su2020$fall_dt
 
 Fun_age_cat <- function(x){
   if(is.na(x)){return("Unknown")}
-  else if(x<=15 | x>30 &x<=45){return("Adults & families")}
+  else if(x<=15 | x>30 &x<=50){return("Adults & families")}
   else if(x>15 &x<=30){return("Adolescents & young adults")}
   else {return("Older adults")} 
 }
@@ -367,14 +367,34 @@ final_cases_imports <- final_cases_function(all_cases_imports)
 
 #####
 
-#Plots:
-cols1 <- wes_palette("GrandBudapest2", length(Re_all)+2, type = c( "continuous"))
-col <- wes_palette("Royal2", 12, type = c( "continuous"))
-cols_country  <- wes_palette("GrandBudapest2",length(unique(BAG_data_su2020$age_cat)), type = c( "discrete"))
-## Visualize reported imports (for time of interest and by countries) and age?
+# Estimating incidence
+#####
+swiss_cases_su2020$incidence <- swiss_cases_su2020$cases_reported/8697905*100000 #https://www.worldometers.info/world-population/switzerland-population/
+
+before <- 7
+after <- 7
+swiss_cases_su2020_add <- data.frame(date = seq(as_date("2020-06-01")-7, as_date("2020-09-30")+7,1),
+           cases_reported = NA)
+swiss_cases_su2020_add$date <-seq(as_date("2020-06-01")-7, as_date("2020-09-30")+7,1)
+swiss_cases_su2020_add$cases_reported <- hist(subset(BAG_data$reported,  BAG_data$reported %in% seq(as_date("2020-06-01")-7, as_date("2020-09-30")+7,1) & BAG_data$ktn != "FL"), breaks = seq(as_date("2020-06-01")-8, as_date("2020-09-30")+7, 1), plot = FALSE)$counts
+
+incidence_fun <- function(x){
+  set <- subset(swiss_cases_su2020_add, swiss_cases_su2020_add$date >= (as_date(x) - before) & swiss_cases_su2020_add$date <= (as_date(x) + after))
+  incidence_weigthed<- mean(set$cases_reported)/8697905*100000
+  return(incidence_weigthed)
+  }
+swiss_cases_su2020$incidence_weigthed <- sapply(swiss_cases_su2020$date, incidence_fun)
 #####
 
-#plot only swiss cases, plot imported, plot all, plot swiss+ unknown
+
+#Plots:
+cols <- wes_palette("GrandBudapest2", length(Re_all)+2, type = c( "continuous"))
+col <- wes_palette("Royal2", 12, type = c( "continuous"))
+cols_age  <- wes_palette("GrandBudapest2",length(unique(BAG_data_su2020$age_cat)), type = c( "discrete"))
+
+## Visualize reported imports
+#####
+#plot reported cases including imported cases + important regulations during time of interest
 swiss_cases_su2020$imports_frac <- swiss_cases_su2020$cases_abroad/(swiss_cases_su2020$cases_abroad+swiss_cases_su2020$cases_swiss)
 BAG_data_su2020$country = factor(BAG_data_su2020$country, levels=unique(names(table(BAG_data_su2020$country))[order(table(BAG_data_su2020$country), decreasing = TRUE)]), ordered=TRUE)
 BAG_data_su2020$country <- factor(BAG_data_su2020$country, levels=c(levels(BAG_data_su2020$country)[!levels(BAG_data_su2020$country) %in% c("Others","Unknown")],c("Others","Unknown")), ordered=TRUE)
@@ -383,7 +403,7 @@ label <- data.frame(
   start_date = c(as_date("2020-06-15"),as_date("2020-06-25"),as_date("2020-08-01"), as_date("2020-06-15")), 
   end_date = c(as_date("2020-09-30"),as_date("2020-09-30"),as_date("2020-09-15"), as_date("2020-08-30")), 
   end_date_dot = c(as_date(format(Sys.time(), "%Y-%m-%d")),as_date(format(Sys.time(), "%Y-%m-%d")),as_date("2020-09-15"), as_date("2020-08-30")), 
-  label = c("Open boarders:","Swiss Covid App:", "University breaks*:", "School breaks*:"))
+  label = c("Open borders:","Swiss Covid App:", "University breaks*:", "School breaks*:"))
 label$label <- factor(label$label, levels= label$label, ordered=TRUE)
 
 p_regulation <- ggplot() +
@@ -432,14 +452,12 @@ p_cases <- ggplot(swiss_cases_su2020, aes(x=date,width=1))+
 
 grid.newpage()
 plot_regulation_cases_reported <- grid.arrange(rbind(ggplotGrob(p_regulation), ggplotGrob(p_cases), size = "last"))
-ggsave(plot_regulation_cases_reported, filename = paste0("../Figures/regulation_cases_reported",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 6, width = 8,  bg = "transparent")
+ggsave(plot_regulation_cases_reported, filename = paste0("../Figures/regulation_cases_reported_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 6, width = 8,  bg = "transparent")
 
 
-plot(swiss_cases_su2020$imports_frac ~swiss_cases_su2020$date,
-     type = "h", xlim =c(time_window[1],time_window[2]), ylim = c(0, 1),xaxt="n",
-     xlab = NA, ylab = "", frame = FALSE, las=2,col=cols[1])
-axis.Date(1, at=seq(min(time_window), max(time_window+1), by="months"), format="%d-%b")
+#plot reported cases including regarding their most likely place of infection and their age category
 
+grid.newpage()
 for(i in 1:2){
   p_import <-list()
   for(c in unname(levels(BAG_data_su2020$country))){
@@ -468,7 +486,7 @@ for(i in 1:2){
     theme_classic()+
     scale_x_date(date_labels = "%d-%b",date_breaks = "1 month", limits = c(time_window[1], time_window[2]))+
     #scale_color_manual(values ="transparent")+
-    scale_fill_manual(values =cols_country)+
+    scale_fill_manual(values =cols_age)+
     labs(x = "", y ="",subtitle =c)+
     theme(plot.margin = margin(8, 2, 2, 2, "mm"),
           panel.background = element_rect(fill = "transparent"), # bg of the panel
@@ -484,9 +502,10 @@ for(i in 1:2){
           legend.key = element_rect(colour = "transparent", fill = "transparent"),
           legend.title = element_text(color = "transparent", size = 2),
           legend.text = element_text(size = 5),
+          legend.key.height= unit(2, 'mm'),
+          legend.key.width= unit(2, 'mm'),
           legend.position = legend_pos)+
     scale_color_manual(name="Categories")+
-    guides(colour = guide_legend(override.aes = list(size=2)))+
     scale_y_continuous(limits = c(0, max_y))
 }
   if(i==1){
@@ -503,9 +522,47 @@ plot_countries1 <- grid.arrange(grobs = p_import_proportion[1:length(levels(BAG_
 plot_countries <- grobTree(plot_countries,textGrob(bquote("a)"), x = 0.02, y = 0.98))
 plot_countries1 <-grobTree(plot_countries1,textGrob(bquote("b)"), x = 0.02, y = 0.98))
 plot_countries <- grid.arrange(plot_countries,plot_countries1,layout_matrix = matrix(1:2,2,1))
-
+grid.newpage()
 ggsave(plot_countries, filename = paste0("../Figures/imports_per_country_day_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 16, width = 14,  bg = "transparent")
 
+
+# Statistics on age and most likely place of infection
+stattest_SwissImports<- data.frame(matrix(0, ncol =0, nrow = length(unique(BAG_data_su2020$country))-1))
+stattest_SwissImports$country <- levels(BAG_data_su2020$country)[-1]
+stattest_SwissImports$ttest <- 0
+stattest_SwissImports$anova <- 0
+for (i in unlist(unname(stattest_SwissImports$country))) { # all countries but not Switzerland (national transmission)
+  test_data<- BAG_data_su2020[BAG_data_su2020$country %in% c("Switzerland", i),]
+  stattest_SwissImports$ttest[stattest_SwissImports$country==i] <- t.test(test_data$altersjahr~test_data$country)$p.value
+  stattest_SwissImports$anova[stattest_SwissImports$country==i] <-  anova(lm(test_data$altersjahr~test_data$country))$"Pr(>F)"[1]
+}
+FUN_sig <- function(x){
+  if (is.na(x)){return(" ")}
+  else if (x =="NA"){return(" ")}
+  else if (x ==" "){return(" ")}
+  else if (as.numeric(x) <= 0.001) {return("<.001")}
+  else if (as.numeric(x) <= 0.01) {return(round(as.numeric(x),3))}
+  else if (as.numeric(x) > 0.01) {return(round(as.numeric(x),3))}
+}
+stattest_SwissImports$ttest_pvalue <- sapply(stattest_SwissImports$ttest , FUN_sig)
+stattest_SwissImports$anova_pvalue <- sapply(stattest_SwissImports$anova , FUN_sig)
+paste0(stattest_SwissImports$country[stattest_SwissImports$ttest<.05],collapse=", ")
+#stattest_SwissImports<- stattest_SwissImports[,c(1,4)]
+#write.csv(statistics_Swiss_vs_Imports, "statistics_Swiss_vs_Imports.csv")
+
+#plot age difference by most likely place of infection
+age_percountry<- ggplot(BAG_data_su2020, aes(x=country, y=altersjahr, colour = factor(country))) +
+  geom_boxplot(aes(y=altersjahr),fill=cols[2],color= cols[1],size=1)+
+  stat_summary(fun=mean, geom="point", shape=3, size=5, color=cols[3], fill=cols[3]) +
+  theme_classic()+
+  theme(axis.text.x = element_text(hjust=0.95,vjust = 0.1, size=12, angle=90),
+        panel.background = element_rect(fill = "transparent"), # bg of the panel
+        plot.background = element_rect(fill = "transparent", color = NA), # bg of the plot
+        legend.background = element_rect(fill = "transparent", color = NA), # get rid of legend bg
+        legend.box.background = element_rect(fill = "transparent", color = NA),
+        legend.position = "none")+
+  labs(x = "", y = "Age (in years)")
+ggsave(age_percountry, filename = paste0("../Figures/age_percountry_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 4, width = 6,  bg = "transparent")
 
 #####
 
@@ -559,7 +616,6 @@ dev.off()
 
 
 #####
-
 
 # Visualizing cases per day with and without Influx
 #####
@@ -853,7 +909,78 @@ for (i in 1:2) {
 
 #####
 
+# Visualizing incidence for simulation regarding reported incidence
+#####
+for (i in 1:3) {
+  if(i==1){
+    import_day <- imports_d 
+    pdf(file=paste0("../Figures/incidence_sim_imports_infect_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = length(imports_d)*4, width =length(dispersion_parameters)*4)
+    incidence_all <- all_cases_imports_infect
+  }
+  if(i==2){
+    import_day <- imports_d[1:3]
+    pdf(file=paste0("../Figures/incidence_sim3_imports_infect",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = length(import_day)*4, width =length(dispersion_parameters)*4)
+    incidence_all <- all_cases_imports_infect
+  }
+  if(i==3){
+    import_day <- imports_d 
+    pdf(file=paste0("../Figures/incidence_sim_imports_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = length(import_day)*4, width =length(dispersion_parameters)*4)
+    incidence_all <- all_cases_imports
+  }
+  par(mar = c(5.1, 8.1, 4.1, 2.1),mfrow=c(length(import_day),length(dispersion_parameters)+1),bg=NA)
+  for (I in 1:length(import_day)) {
+    for (k in 1:length(dispersion_parameters)) {
+      plot(NA,
+           type = "n", xlim =c(time_window[1],time_window[2]), ylim = c(0, 10),xaxt="n",
+           xlab = NA, ylab = "", frame = FALSE, las=2)
+      axis.Date(1, at=seq(min(time_window), max(time_window+1), by="months"), format="%d-%b")
+      
+      for (R in 1:length(Re_all)) {
+        
+        if(I==1){
+          k_num <- dispersion_parameters[k]
+          mtext(bquote(italic("k") == .(k_num)), side=3, line=2, cex.lab=1,las=1, col="black")}
+        
+        if(k ==1){
+          if(I==1){
+            import_num <- 0
+          }
+          else if(I>1){
+            import_num <- sum(import_day[,I])
+          }
+          mtext(bquote(italic("I") == .(import_num)), side=2, line=3, cex.lab=1,las=3, col="black")}
+        col_max <- matrix(0, ncol=2,nrow= 1)
+        col_min <- matrix(1e10, ncol=2,nrow= 1)
+        for (i in 1:runs) {
+          if(sum(incidence_all[[I]][[k]][[R]][,i])>col_max[,2]){
+            col_max[,c(1:2)] <- c(i,sum(incidence_all[[I]][[k]][[R]][,i]))
+          }
+          if(sum(incidence_all[[I]][[k]][[R]][,i])<col_min[,2]){
+            col_min[,c(1:2)] <- c(i,sum(incidence_all[[I]][[k]][[R]][,i]))
+          }
+        }
+        polygon(c(c(time_window[1]:time_window[2]), rev(c(c(time_window[1]:time_window[2])))), c(incidence_all[[I]][[k]][[R]][,col_min[,1]]/8697905*100000, rev(incidence_all[[I]][[k]][[R]][,col_max[,1]]/8697905*100000)),
+                col=alpha(cols[R],0.4), border = NA)
+      }
+      
+      points(c(time_window[1]:time_window[2]), swiss_cases_su2020$incidence, col=col[3], pch=20, cex=0.5)
+      lines(c(time_window[1]:time_window[2]), swiss_cases_su2020$incidence_weigthed,col=col[1])
+      
+      if(k== 4){
+        plot(NA, type = "n", xlim =c(0,1), ylim = c(0,1),xaxt="n", yaxt="n", xlab = NA, ylab = "", frame = FALSE)
+        if(I==1){
+          legend(-0.1,1, legend=c("Incidence of reported cases",as.expression(bquote("Stochastic interval for " ~ italic("R"["e"]))),  paste("''",Re_all)),
+                 inset=.02,fill=c(col[1], "transparent", cols[1:length(Re_all)]), cex=1.25,bty = "n", border = F)
+          
+        }
+      }
+    }
+  }
+  
+  dev.off()
+}
 
+#####
 #save.image("/Users/mr19m223/Documents/COVID_projects/Epidemic_Su2020/StochasticModel_SarsCoV2/su2020_cov2/su2020_cov2.RData")
 
 
