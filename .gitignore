@@ -1,10 +1,23 @@
 #specific for this folder
-Backup/
+Backups/
+data/
 .DS_Store
+*_data_prep.R
+BAG_data_su2020.csv
+*.rds
 
 # History files
 .Rhistory
 .Rapp.history
+
+# unnecassary tex files
+*.log
+*.synctex.gz
+*.aux
+*.out
+*.fdb_latexmk
+*.bbl
+*.blg
 
 # Session Data files
 *.RData
