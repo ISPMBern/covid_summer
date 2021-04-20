@@ -101,7 +101,7 @@ for (R in 1:length(Re_fig2)) {
   Ri <- grep(Re_fig2[R], round(Re_all,2))
   all_cases_r <-c()
   for (r in Ri) {
-    all_cases_r <- rbind(all_cases_r,all_cases_imports_infect[[I]][[r]])
+    all_cases_r <- cbind(all_cases_r,all_cases_imports_infect[[I]][[r]])
   }
   for (d in 1:max_time) {
     cases_summary[d,c(4:6)] <- quantile(as.numeric(all_cases_r[d,]),probs) 
@@ -147,7 +147,7 @@ plots <- list()
 for (I in 1:length(I_fig2)) {
   if(I==1){
     tags <- "a)"
-    x_name <- "Reported cases"
+    x_name <- "No. cases"
   }
   else{
     tags <- ""
@@ -198,6 +198,7 @@ plots[[1]] <- basic_figplot +
   scale_fill_manual(values=col_4[1:3],label= I_fig2) +
   scale_x_continuous(breaks = seq(from = 0.8, to = 1.2, by = 0.1))+
   theme(legend.position = "none")+
+  #coord_cartesian(ylim = c(10^3, 10^5)) +
   labs(tag=bquote(.("b)")), x = bquote(italic("R"["e"])), y =bquote("Cumulative cases"))
 f2_cum <- grid.arrange(grobs = plots,layout_matrix =  matrix(1,1))
 
@@ -212,6 +213,7 @@ plots[[1]] <- basic_figplot +
   scale_fill_manual(values=col_4[1:3],label= I_fig2) +
   scale_x_continuous(breaks = seq(from = 0.8, to = 1.2, by = 0.1))+
   theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 10^3)) +
   labs(tag=bquote(.("c)")), x = bquote(italic("R"["e"])), y =bquote("Final size"))
 f2_final <- grid.arrange(grobs = plots,layout_matrix =  matrix(1,1))
 
@@ -269,7 +271,7 @@ for (I in 1:length(I_supfig1)) {
     Ri <- grep(Re_supfig1[R], round(Re_all,2))
     all_cases_r <-c()
     for (r in Ri) {
-      all_cases_r <- rbind(all_cases_r,all_cases_imports_infect[[I]][[r]])
+      all_cases_r <- cbind(all_cases_r,all_cases_imports_infect[[I]][[r]])
     }
     for (d in 1:max_time) {
       cases_summary[d,c(4:6)] <- quantile(as.numeric(all_cases_r[d,]),probs) 
@@ -284,11 +286,13 @@ for (I in 1:length(I_supfig1)) {
 }
 cases_I_summary_all$date <- as_date(cases_I_summary_all$date)
 #saveRDS(cases_I_summary_all, paste0("../data/cases_I_summary_all_",Sys.Date(),".rds"))
+cases_I_summary_all<- readRDS("cases_I_summary_all_2021-04-20.rds")
+
 plots <- list()
 for (I in 1:length(I_supfig1)) {
-  if(I==1){
+  if(I==3){
     tags <- ""
-    x_name <- "Reported cases"
+    x_name <- "No. cases"
   }
   else{
     tags <- ""
@@ -353,6 +357,7 @@ sf2_final<- basic_figplot +
   scale_color_manual(values=col_3[3], name="Expected cases") +
   scale_x_continuous(breaks = seq(from = 0.8, to = 1.2, by = 0.1))+
   theme(legend.position = "none")+
+  coord_cartesian(ylim = c(0, 10^3)) +
   labs(tag=bquote(.("b)")), x = bquote(italic("R"["e"])), y =bquote("Final size"))+
   facet_wrap(~ as.character(imports))
 
@@ -372,8 +377,7 @@ sf2_growthrate <- basic_figplot +
 
 plot_sf2 <- grid.arrange(
   grobs = list(sf2_cum, sf2_final,sf2_growthrate),
-  layout_matrix = rbind(1,2,3))
-
+  layout_matrix = rbind(1,2,3),size = "last")
 ggsave(plot_sf2, filename = paste0("SF2_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 10, width = 4,  bg = "transparent")
 grid.newpage()
 
@@ -384,6 +388,7 @@ grid.newpage()
 grid.newpage()
 country_level <- table(BAG_data_su2020$country)[order(table(BAG_data_su2020$country),decreasing=TRUE)]
 BAG_data_su2020$country <-  factor(BAG_data_su2020$country, levels = c("Switzerland", names(country_level)[!names(country_level) %in% c("Switzerland","Others","Unknown")],"Others","Unknown"))
+BAG_data_su2020$age_cat<- factor(BAG_data_su2020$age_cat, levels=c("<21","21-64",">64","Unknown"))
 
 for(i in 1:2){
   p_import <-list()
@@ -442,7 +447,7 @@ legend_sup3  <- g_legend(legend,1)
 
 
 p_import[[3]] <- p_import[[3]]+labs(y = "Number of reported cases",subtitle =levels(BAG_data_su2020$country)[3])
-p_import_proportion[[3]] <- p_import_proportion[[3]]+labs(y = "Fraction age categories of reported cases per day",subtitle =levels(BAG_data_su2020$country)[3])
+p_import_proportion[[3]] <- p_import_proportion[[3]]+labs(y = "Proportion of age categories of reported cases per day",subtitle =levels(BAG_data_su2020$country)[3])
 
 plot_countries <- grid.arrange(grobs = p_import,layout_matrix =  matrix(1:25,5,5))
 plot_countries_proportion <- grid.arrange(grobs = p_import_proportion,layout_matrix =  matrix(1:25,5,5))
@@ -467,13 +472,15 @@ age_percountry<- ggplot(BAG_data_su2020, aes(x=country, y=age)) +
         panel.grid.minor = element_blank(), # get rid of minor grid
         legend.position = "none")+
   labs( x = "", y = "Age (in years)")
+
+age_percountry <- grid.arrange(age_percountry, ncol=1)
 age_percountry <-grobTree(age_percountry,textGrob(bquote("c)"), x = 0.02, y = 0.98))
 plot_countries_age <- grid.arrange(plot_countries,legend_sup3,age_percountry,layout_matrix =  rbind(c(1,1,1,1),
                                                                                                     c(1,1,1,1),
                                                                                                     c(1,1,1,1),
                                                                                                     c(1,1,1,1),
                                                                                                     c(3,3,3,2)))
-ggsave(plot_countries_age, filename = paste0("SF4_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 15, width = 6,  bg = "transparent")
+ggsave(plot_countries_age, filename = paste0("SF3_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 15, width = 6,  bg = "transparent")
 #####
 
 # Supplementary Figure 4: Regional differences in cross-border associated cases

@@ -158,7 +158,7 @@ Onwards local transmission was simulated using $\mathcal{R}_e$ values ranging fr
 Within this range we considered $10^3$ uniformly distributed values.
 Imports were added on the day that they were reported to the FOPH to the pool of local infectious cases throughout the simulation, and thus initiating new branches of local transmission.
 Due to missing data, extrapolated number of imports was estimated.
-We multiplied the number of imports by $1+ \frac{\Sigma ~of ~cases ~with ~known ~origin }{\Sigma ~of ~all ~confirmed ~cases}$.
+We multiplied the number of imports by $1+ \frac{\Sigma ~of ~cases ~with ~known ~exposure }{\Sigma ~of ~all ~reported ~cases}$.
 In total, we considered seven scenarios of number of imports that resulted from multiplying by zero, one, two, three, weighted imports, and combinations (Table \ref{t1}).
 
 All simulations could not exceed $10^6$ cases during the time of interest.
@@ -166,7 +166,7 @@ For each scenario, we computed the 95\% CI of cumulative cases, final size, and 
 
 \begin{table*}[h]
 	\centering
-\caption{Summary of parameter values used for simulating epidemics.*Normal distribution with a mean of 0.51. **Reported imports were weighted with $1+ \frac{\Sigma ~of ~cases ~with ~known ~origin }{\Sigma ~of ~all ~confirmed ~cases}$ or multiplied with 0, 1, 2 or 3.}
+\caption{Summary of parameter values used for simulating epidemics.\\*Normal distribution with a mean of 0.51. **Reported imports were weighted with $1+ \frac{\Sigma ~of ~cases ~with ~known ~exposure }{\Sigma ~of ~all ~reported ~cases}$ or multiplied with 0, 1, 2 or 3.}
 \label{t1}
 \begin{tabular}{clll}
 	\hline
@@ -209,7 +209,11 @@ The peak of reported imports was on $6^{th}$ of September 2020 (Figure \ref{f1}c
 \begin{figure*}[h]
 \centering
 \includegraphics[scale=0.5]{Figure1_2021-04-19.pdf}
-\caption{Reported cases and major events in Switzerland: a) Bars visualise major events from $1^{st}$ June to $30^{th}$ of September. b) Line visualises the KOF stringency plus index that records the stringency of COVID-19 policy measures in Switzerland over time. The values range from 0 (= no measures) to 100 (= full lockdown) (see \href{https://kof.ethz.ch/en/forecasts-and-indicators/indicators/kof-stringency-index.html}{here}. c) Blue bars show cross-border-associated cases per day and pink bars show all reported cases. d) Transparent and light blue bars show the fraction $\frac{\Sigma ~of ~cases ~with ~origin~aboard }{\Sigma ~of ~cases ~with ~known ~origin }$  and the dark blue bars show the fraction $\frac{\Sigma ~of ~cases ~with ~known ~origin }{\Sigma ~of ~all ~confirmed ~cases}$. $*$Official breaks of universities and schools might vary for different subjects and between different schools and cantons, respectively. More details on quarantine measures in Table \ref{t2} and \href{https://www.fedlex.admin.ch/eli/cc/2021/61/de}{here}.}
+\caption{Reported cases and major events in Switzerland: 
+a) Lines visualise six major events from $1^{st}$ June to $30^{th}$ of September 2020. 
+b) Line visualises the KOF stringency plus index that records the stringency of COVID-19 policy measures in Switzerland over time. The values range from 0 (= no measures) to 100 (= full lockdown) (see \href{https://kof.ethz.ch/en/forecasts-and-indicators/indicators/kof-stringency-index.html}{here}. 
+c) Pink bars show all reported cases per day and blue bars only cross-border-associated cases. 
+d) Transparent and light blue bars show the fraction $\frac{\Sigma ~of~exposures~aboard }{\Sigma ~of~exposure~with~known~origin }$  and the dark blue bars show the fraction $\frac{\Sigma  ~of~exposures~aboard}{\Sigma ~of~all~confirmed~cases}$. $*$Official breaks of universities and schools might vary for different subjects and between different schools and cantons, respectively. More details on quarantine measures in Table \ref{t2} and \href{https://www.fedlex.admin.ch/eli/cc/2021/61/de}{here}.}
 \label{f1}
 \end{figure*}
 
@@ -234,13 +238,13 @@ With 3,304, 5050, 6608, 9912,10096, or 15154 imports a $\mathcal{R}_e$ of 0,974 
 
 \begin{figure*}[h!]
 \centering
-\includegraphics[scale=0.3]{Figure2_2021-04-19.pdf}
-\caption{Impact of imports on the epidemic.
-a) Green dots are reported cases per day and the curves represent 95\%-CI of simulated cases per day.
-b) Cumulative cases with zero, 3304, and 5,050 imports, dashed line represent reported cases during $1^{st}$ of June to $30^{th}$ of September 2020 (dashed line represent the 95\%-CI). 
-c) Final number of cases with zero, 3304, and 5,050 imports, dashed line represent the 95\%-CI of reported cases on $30^{th}$ of September 2020.
-d) y-axis the epidemic growth rate; x-axis $\mathcal{R}_e$ values; intervals represents 95\%-CI.
-Abbreviations: I, number of imports; CI, confidence interval}
+\includegraphics[scale=0.3]{Figure2_2021-04-20.pdf}
+\caption{Impact of imports on the local epidemic.
+a) Blue dots are all reported SARS-CoV-2 cases per day and curves represent 95\%-CI of simulated cases per day regarding three $\mathcal{R}_e$ values.
+b) Curves represent 95\%-CI of simulated cumulative cases with zero, 3304, and 5,050 imports; dashed line represents reported cases during $1^{st}$ June to $30^{th}$ September 2020. 
+c) Curves represent 95\%-CI of simulated final number of cases with zero, 3304, and 5,050 imports; dashed line represent the 95\%-CI of reported cases on $30^{th}$ September 2020.
+d) Curves represent 95\%-CI of simulated epidemic growth rates; dashed line represent 95\%-CI of the epidemic growth rate of cases reported during $1^{st}$ June to $30^{th}$ September 2020.
+Abbreviations: CI, credible interval; k, dispersion parameter; I, number of cross-border-associated cases.}
 \label{f2}
 \end{figure*}
 \end{multicols}
@@ -254,38 +258,37 @@ Abbreviations: I, number of imports; CI, confidence interval}
 \section{Discussion}
 The SARS-CoV-2 epidemic in Switzerland grew from a few dozen confirmed cases per day in early June 2020 to several hundred by the end of September 2020. 
 Ignoring cross-border-associated cases the $\mathcal{R}_e$ was above one for the time of interest. 
-In summer 2020, however, around a quarter of cases that have been reported to the Swiss FOPH were cross-border-associated cases.
+In summer 2020, however, around a quarter of cases that had been reported to the Swiss FOPH were cross-border-associated cases.
 We also found that different age groups were exposed to the SARS-CoV-2 in different countries abroad.
-Further, with our stochastic simulations we showed that the local epidemic had a $\mathcal{R}_e$ below one, i.e. a value below the critical threshold.
-At the end of summer 2020, the reported cases stabilised (also in the simulations if $\mathcal{R}_e <1$).
+With our stochastic branching process we showed that the local epidemic had a $\mathcal{R}_e$ below one, i.e. a value below the critical threshold.
+At the end of summer 2020, the reported cases stabilised (also in simulations if $\mathcal{R}_e <1$).
 Thus, cross-border-associated cases and their local spread was one of the leading forces that led to several hundred cases per day within three months, i.e., by the end of September 2020. 
 Consequently, the effect of cross-border-associated cases cannot be ignored in understanding and regulating a local epidemic (during a pandemic).
 
-Our method has limitations that need to be addressed.
-In our stochastic model, we did not account for a saisonal effect of the SARS-CoV-2, different restrictions carried out, social contact pattern or age-related mixing patterns.
+Our method has several limitations that need to be addressed.
+In our stochastic branching process, we did not account for a saisonal effect of the SARS-CoV-2, different restrictions carried out, social contact pattern or age-related mixing patterns.
 We were not interested to simulated single transmission chains.
-Our model was calibrated to assess the impact of cross-border-associated cases on an epidemiological, i.e. population-based, level.
-We did not consider the geographical region of residence, i.e. the canton, we found no evidence of relevant different rates of cross-border-associated cases (Supplementary Figure \ref{sf4}).
-Our approach assumes a constant growth rate over the summer period and ignores immunity, which we consider acceptable during this low prevalence and incidence period.
+Stochastic effects have been showed to play an important role in determining the outcome of the outbreak.\cite{althaus_ebola_2015}
+Our stochastic branching process was calibrated to assess the impact of cross-border-associated cases on an epidemiological, i.e. population-based, level.
+We did not consider the geographical region of residence, i.e. the canton, of cases.
+We found no evidence of relevant differences of cross-border-associated cases (Supplementary Figure \ref{sf4}).
+Our approach assumes a constant growth rate over the summer period and ignores immunity, which we consider acceptable during this low prevalence and incidence time:
 The SFOPH reported 30,883 cases before $1^{st}$ June and 23,199 more until $30^{th}$ September.
 Growth rates, can be calculated for different intervals, e.g., one week or months, we decided assumes a constant growth rate.
 This was more appropriate to calculate the overall influence of cross-border-associated cases.
-The stochastic branching process was calibrated to simulate the number of reported cases.
-Stochastic effects have been showed to play an important role in determining the outcome of the outbreak.\cite{althaus_ebola_2015}
 
-Further, it is unlikely that all SARS-CoV-2cases have been tested, but in Switzerland all cases tested have been reported to the FOPH.
+Further, it is unlikely that all SARS-CoV-2 cases had been tested, but in Switzerland all cases tested have been reported to the FOPH.
 Studies reported about a two-fold (or more) underreporting of SARS-CoV-2 infections.\cite{Li_substantial_2020,Wu_substantial_2020}
 The degree of under-ascertainment can not be evaluated for the used surveillance data.\textcolor{red}{[true?]}
 Moreover, there is a delay of infection to testing and reporting.
 We ignored this delay for all cases.
-Thus, our results reflect the day of testing and reporting and not the start of infection.
+Thus, our simulations reflect the day of testing and reporting and not the start of infection.
 During the time of the study, testing was free and mandatory for symptomatic cases, but not for asymptomatic cases.
 However, if they had contact with a positive person they were required to do isolate and test themselves. 
 The contact tracing was provided either by the person themselves, through authorities or the Swiss Covid app (launched on $15^{th}$ June 2020).\cite{salath_early_2020}
 As our study period covered only summer it is be expected that seasonality played a role.
-However, people were more active in summer than in winter and likely more optimistic about the pandemic (at the end of summer), which likely resulted in more social contacts than before.
+However, people were more active during summer than during winter and likely more optimistic about the pandemic (mostly at the end of summer 2020), which likely resulted in more social contacts than before.
 
-With our stochastic branching model, we were able to confidentially simulate the Swiss epidemic.
 Also in other countries, travel had a strong impact on the local epidemic.\cite{russell_effect_2021,hodcroft_emergence_2020}
 Linka et al., showed a correlation between air travel, driving, walking, and transit mobility and the $\mathcal{R}_e$.\cite{linka_reproduction_2020}
 Unfortunately, social contact pattern or age-related mixing patterns are missing for this time in Switzerland.
@@ -300,19 +303,19 @@ Nevertheless, there is a need of analysis that include several more variables, s
 These will help to more precisely forecast future outbreaks and pandemics.
 
 Our results are important to derive travel strategies, including mandatory quarantine and test strategies for the coming summer 2021.
-It is likely that (global) herd immunity will not be achieved in the summer, so existing measures such as testing and physical distancing remain important to keep cases low.
+It is likely that (global) herd immunity will not be achieved in the summer 2021, so existing measures such as testing and physical distancing remain important to keep cases low.
 In addition, there is still uncertainty about asymptomatic cases.\cite{nogrady_what_2020}
 Studies found the proportion of asymptomatic cases to be 17\% (or 20\%) and 1/4 less transmissible.\cite{byambasuren_estimating_2020,buitrago-garcia_occurrence_2020,bi_household_2020}
-It should be an option to test all people that cross borders and give them the option of reduced quarantine for negative cases.\cite{ashcroft_quantifying_2021}
-In the summer of 2020, only five countries from 21 countries with at least a dozen cross-border-related cases were on the mandatory quarantine list at the beginning of July.
+It could be an option to test all people that cross borders and give them the option of reduced quarantine for negative cases.\cite{ashcroft_quantifying_2021}
+In the summer of 2020, only five countries from 21 countries with at least a dozen cross-border-associated cases were on the mandatory quarantine list at the beginning of July 2020.
 A handful of countries of these 21 had not been on the list during summer.
-Mandatory quarantine and testing might reduce the willingness to travel as the effort and awareness of the SARS-CoV-2 pandemic remains.
-Thus, travel mobility can be reduced, and cross-border-associated cases and their local spreading are minimised through testing and mandatory quarantine.
+Mandatory quarantine and testing might reduce the willingness to travel as the effort and awareness of the SARS-CoV-2 pandemic will remain.
+Thus, travel mobility might be reduced, and cross-border-associated cases and their local spreading might be minimised through testing and mandatory quarantine.
 %https://www.eurosurveillance.org/content/10.2807/1560-7917.ES.2020.25.4.2000057/?crawler=true. 
 
 Switzerland is a relatively small country with a few million citizens, but due to its location (and its wealth) there is a high potential for travel to have a huge impact on the epidemic.
 Quantifying the role of imports on the national dynamics of SARS-CoV-2 epidemics requires further investigation. 
-In Switzerland, cross-border-associated cases might have had a considerable impact on the national dynamics and could explain the growth of the SARS-CoV-2 epidemic during summer 2020. 
+In Switzerland, cross-border-associated cases have had a considerable impact on the national dynamics and could explain the growth of the SARS-CoV-2 epidemic during summer 2020. 
 Our results underline the importance of improved surveillance for international travellers in order to better control the spread of SARS-CoV-2.
 
 \textcolor{red}{Open issues: Delay from infection to reporting. and underreporting in discussion - over- or dispersion parameter? for weighted growth rate/Re deaths/hospitalisation not shifted! }
@@ -350,16 +353,17 @@ European Union’s Horizon 2020 research and innovation programme - project EpiP
 \clearpage
 \begin{suppfigure}[h]
 \centering
-\includegraphics[scale=0.4]{SF1_2021-04-19.pdf}
-\caption{Impact of cross-border-associated cases on the cases per day that infected further: y-axis cases per day; x-axis the time of interest. Different number of cross-border-associated cases \emph{I} were added to a stochastic branching model whereby these \emph{I} could transmit further: \emph{I} was zero, reported \emph{I}, reported \emph{I} multiplied by $1+ \frac{\Sigma ~of ~cases ~with ~unknown ~origin }{\Sigma ~of ~all ~confirmed ~cases}$, and these multiplied with 2 and 3, respectively. Yellow dots show the reported cases per day. Abbreviations: k, dispersion parameter; I, number of travel associated cases.}
+\includegraphics[scale=0.4]{SF1_2021-04-20.pdf}
+\caption{Impact of cross-border-associated cases on the local epidemic: 
+Blue dots are all reported SARS-CoV-2 cases per day and curves represent 95\%-CI of simulated cases per day regarding five $\mathcal{R}_e$ values. Graphs are separated by the number of cross-border-associated cases. Different number of cross-border-associated cases \emph{I} were added to a stochastic branching model whereby these \emph{I} could transmit further: \emph{I} was zero, reported \emph{I}, reported \emph{I} multiplied by $\frac{\Sigma ~of ~cases ~with ~known ~exposure }{\Sigma ~of ~all ~reported ~cases}$, and these multiplied with 1, 2, or 3, respectively. Abbreviations: CI, credible interval; k, dispersion parameter; I, number of cross-border-associated cases.}
 \label{sf1}
 \end{suppfigure}
 
 \clearpage
 \begin{suppfigure}[h]
 \centering
-\includegraphics[scale=0.6]{SF2_2021-04-19.pdf}
-\caption{a) cumulative cases b) final size c) growth rate. Dashed line shows the reported cases during $1^{st}$ of June to $30^{th}$ of September 2020 and on the $30^{th}$ of September 2020. Abbreviations: k, dispersion parameter; I, number of travel associated cases.}
+\includegraphics[scale=0.6]{SF2_2021-04-20.pdf}
+\caption{Impact of cross-border-associated cases on the local epidemic: Grey curves are simulations with their 95\%-CI. a) cumulative cases b) final size c) epidemic growth rate. Dashed line show expected cases during $1^{st}$ of June to $30^{th}$ of September 2020, expected cases on $30^{th}$ of September 2020, and expected epidemic growth rate. Abbreviations: CI, credible interval}
 \label{sf2}
 \end{suppfigure}
 
@@ -367,8 +371,8 @@ European Union’s Horizon 2020 research and innovation programme - project EpiP
 \clearpage
 \begin{suppfigure}[h]
 \centering
-\includegraphics[scale=0.4]{SF3_2021-04-13.pdf}
-\caption{Reported cases and the most likely country of exposure. a) y-axis and x-axis shows time of interest and number of reported cases and proportion of different age groups b) y-axis shows the fraction of all cases and proportion of different age groups. c) Age distribution for reported cases according to the most likely country of exposure. + represents the mean of the age in the corresponding group, the horizontal line is the mean of the age of all cases that were exposed only in Switzerland.}
+\includegraphics[scale=0.5]{SF3_2021-04-20.pdf}
+\caption{Reported cases and the most likely country of exposure. a) number of reported cases and proportion of different age groups b) proportion of all cases and proportion of different age groups. c) Age distribution for reported cases according to the most likely country of exposure. + represents the mean of the age in the corresponding group, the horizontal line is the mean of the age of all cases that were exposed only in Switzerland.}
 \label{sf3}
 \end{suppfigure}
 
@@ -376,8 +380,8 @@ European Union’s Horizon 2020 research and innovation programme - project EpiP
 \clearpage
 \begin{suppfigure}[h]
 \centering
-\includegraphics[scale=0.4]{SF4_2021-04-09.pdf}
-\caption{Regional origin of cases that reported place of exposure}
+\includegraphics[scale=0.4]{SF4_2021-04-20.pdf}
+\caption{Place and region of residency regarding reported exposure places}
 \label{sf4}
 \end{suppfigure}
 
