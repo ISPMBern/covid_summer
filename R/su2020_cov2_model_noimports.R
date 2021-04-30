@@ -9,12 +9,15 @@ library(MASS)
 library(lubridate)
 library(MCMCglmm)
 library(RDS)
-
+library(doParallel)
+library(foreach)
+registerDoParallel(cores=10)
 # Set seed
 set.seed(60321)
 
 # COVID-19 cases observed in Summer (Jun-Sep) 2020 in Switzerland
 #z = as.numeric(commandArgs(trailingOnly=TRUE))
+#setwd("/Users/mr19m223/Documents/COVID_projects/Epidemic_Su2020/covid_summer/data")
 
 # load data
 cases_su2020 <- read.csv("cases_su2020.csv", row.names = 1, header=T, sep=",")
@@ -24,27 +27,31 @@ time_window <- c(as_date("2020-06-01"), as_date("2020-09-30"))
 cases_su2020$date <- as_date(cases_su2020$date)
 swiss_cases_su2020 <- subset(cases_su2020, date %in% seq(time_window[1],time_window[2],1))
 swiss_cases_su2020$weekend <- ifelse(weekdays(swiss_cases_su2020$date) == "Saturday" | weekdays(swiss_cases_su2020$date) == "Sunday", 1, 0)
-
 probs = c(.025,.5,.975)
+period <- c(time_window[1]:time_window[2])
+max_time <- length(period)
+#only first time:
+Re_all <- numeric(1e5)
+while(length(unique(Re_all)) !=1e5) {
+Re_all <- as.vector(runif(1e5,0.8,1.2))
+}
+Re_all <- Re_all[order(Re_all)]
+dispersion_parameters <- as.vector(rtnorm(1e5,mean=0.51,lower=0.49,upper=0.52))
+dispersion_parameters <- dispersion_parameters[order(dispersion_parameters)]
+write.csv(Re_all, paste0("Re_all_",Sys.Date(),".csv"))
+write.csv(dispersion_parameters, paste0("dispersion_parameters_",Sys.Date(),".csv"))
 
 # Initialize simulation
 #####
-
 generation_time <- mu <- 5.2
 sigma <- 1.72
 variance <- sigma^2
 gamma_rate <- mu/variance #gamma_shape/generation_time
 gamma_shape <- mu^2/variance
 
-Re_all <- as.vector(runif(1e3,0.8,1.2))
-
-period <- c(time_window[1]:time_window[2])
-max_time <- length(period)
-dispersion_parameters <- as.vector(rtnorm(1e3,mean=0.51,lower=0.49,upper=0.52))
-
 secondary <-c()
 secondary_t <- c()
-cases_d_runs <- data.frame(array(0, dim = c(max_time,length(dispersion_parameters))))
+cases_d_runs <- data.frame(array(0, dim = c(max_time,1)))
 
 seeds <- data.frame(date=as_date((time_window[1]-7):(time_window[1]-1)))
 seeds$weekend <- ifelse(weekdays(seeds$date) == "Saturday" | weekdays(seeds$date) == "Sunday", 1, 0)
@@ -59,31 +66,32 @@ est_interval_fun <- function(data, model){
 seeds <- est_interval_fun(seeds,fit)
 min_max_seeds <- c(min(seeds[,-c(1:2)]):max(seeds[,-c(1:2)]))
 
-
 #####
-
+model_outputs <- data.frame(array(as.numeric(0), dim = c(length(Re_all), 7+max_time)))
+colnames(model_outputs) <- c("seeds","imports","Re","dispersion_parameter_noimports","dispersion_parameter_imports","cum_cases","final_incidence")
 
 # Stochastic branching model without imports
 #####
 su2020_cases<- function(Re, dispersion){
-  lapply(Re,function(R) {
-    cat(R)
-    sapply(1:length(dispersion),function(i) {
-      k <- dispersion[i]
+  foreach(Ri=1:length(Re)) %dopar% {#lapply(Re,function(R) {
+    R<-Re[Ri]
+    cases_d_runs[,1] <- 0
+      k <- sample(dispersion_parameters, size=1)
       seeds$seeds_d <- round(sample(min_max_seeds, length(seeds$date), replace = TRUE))
       t0  <- rep(as.numeric(seeds[,1])-as.numeric(time_window[1]-1), seeds$seeds_d)
       secondary_t <- t0
-      while(length(secondary_t<max_time+0.5) >0 & sum(cases_d_runs[,i])<1e6) {
+      while(length(secondary_t<max_time+0.5) >0 & sum(cases_d_runs[,1])<1e6) {
         secondary <- rnbinom(length(secondary_t), size = k, mu = R)
         secondary_t <- rep(secondary_t[secondary_t<(max_time+0.5)], secondary[secondary_t<(max_time+0.5)])
         secondary_t <- secondary_t + round(rgamma(length(secondary_t), shape = gamma_shape, rate = gamma_rate))
-        cases_d_runs[match(names(table(secondary_t[secondary_t>0&secondary_t<(max_time+0.5)])),rownames(cases_d_runs)),i] <-  cases_d_runs[match(names(table(secondary_t[secondary_t>0&secondary_t<(max_time+0.5)])),rownames(cases_d_runs)),i] + table(secondary_t[secondary_t>0&secondary_t<(max_time+0.5)])
+        cases_d_runs[match(names(table(secondary_t[secondary_t>0&secondary_t<(max_time+0.5)])),rownames(cases_d_runs)),1] <-  cases_d_runs[match(names(table(secondary_t[secondary_t>0&secondary_t<(max_time+0.5)])),rownames(cases_d_runs)),1] + table(secondary_t[secondary_t>0&secondary_t<(max_time+0.5)])
       }
-      return(cases_d_runs[,i])
-    })
-  })
+      model_outputs[Ri,]<- c(sum(seeds$seeds_d),0,R,k,NA,sum(cases_d_runs),cases_d_runs[max_time,1], cases_d_runs[,1])
+      return(model_outputs[Ri,])}
 }
 
-cases_d_runs_all <- su2020_cases(Re_all, dispersion_parameters)
-saveRDS(cases_d_runs_all, paste0("cases_d_noimports_",Sys.Date(),".rds"))
+model_outputs <- su2020_cases(Re_all, dispersion_parameters)
+model_outputs <- as.data.frame(do.call(rbind, lapply(model_outputs, `length<-`, max(lengths(model_outputs)))))
+
+saveRDS(model_outputs, paste0("noimport_model_output_",Sys.Date(),".rds"))
 
