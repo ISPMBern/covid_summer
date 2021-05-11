@@ -86,7 +86,7 @@ swiss_cases_su2020$incidence_weigthed <- sapply(swiss_cases_su2020$date, inciden
 BAG_data_su2020$country <- factor(BAG_data_su2020$country, levels=unique(names(table(BAG_data_su2020$country))[order(table(BAG_data_su2020$country), decreasing = TRUE)]), ordered=TRUE)
 BAG_data_su2020$country <- factor(BAG_data_su2020$country, levels=c(levels(BAG_data_su2020$country)[!levels(BAG_data_su2020$country) %in% c("Others","Abroad but unknown","Unknown")],c("Others","Abroad but unknown","Unknown")), ordered=TRUE)
 
-## restriction, measures, quarantine
+
 ### school holidays (https://schulferien-ch.ch/schulferien-2020/) #if several dates widest range
 su2020_schoolbreak <- data.frame(label= c("AG", "AR","AI", "VL", 
                                           "BS", "BE", "FR", "GE", 
@@ -137,7 +137,7 @@ su2020_unibreak <- data.frame(label=c("all"),
                               end_date=c("2020-09-13"),
                               end_date_dot=c("2020-09-13"))
 
-### quarantine #https://www.fedlex.admin.ch/eli/cc/2020/496/en
+### quarantine list: https://www.fedlex.admin.ch/eli/cc/2020/496/en
 ## The number of new infections in the country or area concerned in the past 14 days is more than 60 per 100 000 persons, and this number is not due to spe-cific incidents or cases occurring in a narrowly defined geographical area.
 # into operation on 2020-07-06: 10d quarantine if traveled from: Argentina, Armenia, Azerbaijan, Bahrain, Belarus, Bolivia, Brazil, Chile, Dominican Republic, Honduras, Iraq, Israel, Cap Verde, Qatar, Colombia, Kosovo, Kuwait, Moldova, North Macedonia, Oman, Panama, Peru, Russia, Saudi Arabia, Sweden, Serbia, RSA, Turks and Caicos Islands, USA
 # into operation on 2020-07-23: 10d quarantine if traveled from: Argentina Armenia Azerbaijan Bahrain Bolivia Bosnia and Herzegovina Brazil Cape Verde Chile Colombia Costa Rica Dominican Republic Ecuador El Salvador Eswatini (Swaziland) Guatemala Honduras Iraq Israel Kazakhstan Kosovo Kuwait Kyrgyzstan Luxembourg Maldives Mexico Moldova Montenegro North Macedonia Occupied Palestinian Territory Oman Panama Peru Qatar Russia Saudi Arabia Serbia South Africa Suriname Turks and Caicos Islands United Arab Emirates United States of America  (including Puerto Rico and the United States Virgin Islands)

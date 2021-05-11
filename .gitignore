@@ -5,6 +5,7 @@ data/
 *_data_prep.R
 BAG_data_su2020.csv
 *.rds
+*RDataTmp
 
 # History files
 .Rhistory
