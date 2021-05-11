@@ -1,8 +1,5 @@
 ## COVID-19 in summer 2020
 
 In summer 2020, the severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) epidemic in Switzerland grew from a few dozen confirmed cases to several hundred cases per day. During this time, holiday travel in Switzerland was largely allowed without quarantine which might lead to more SARS-CoV-2 cases. The impact of such cross-border-associated cases (imports) on the national epidemic dynamics remains unclear. 
-<<<<<<< HEAD
+
 Our objective was to assess the impact of imports on the SARS-CoV-2 epidemic in Switzerland during between June and September 2020. Therefore, we used a stochastic branching process model to find the most plausible trajectories of the summer 2020 epidemic in Switzerland. To parameterise our model, we analysed reported SARS-CoV-2 cases and the most likely country of their exposure, i.e., where they had been the last 14 days before they got tested or began to have symptoms. We selected epidemic trajectories that were consistent with data reported by the Swiss Federal Office of Public Health. Finally, we quantify the impact of cross-border-associated cases on the local SARS-CoV-2 incidence in Switzerland.
-=======
-Our objective was to assess the impact of imports on the SARS-CoV-2 epidemic in Switzerland during summer 2020. Therefore, we used a stochastic branching process model to find the most plausible trajectories of the summer 2020 epidemic in Switzerland. To parameterize our model, we analysed reported SARS-CoV-2 cases and the most likely country of their exposure, i.e., where they had been the last 14 days before they got tested or began to have symptoms. We selected epidemic trajectories that were consistent with data reported by the Swiss Federal Office of Public Health. Finally, we quantify the impact of cross-border-associated cases on the local SARS-CoV-2 incidence in Switzerland between June and September 2020. 
->>>>>>> e7d0fbc4fe7b0377f7041407870e56647644005d
