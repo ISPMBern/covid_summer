@@ -33,13 +33,22 @@ max_time <- length(period)
 #only first time:
 Re_all <- numeric(1e5)
 while(length(unique(Re_all)) !=1e5) {
-Re_all <- as.vector(runif(1e5,0.8,1.2))
+Re_all <- as.vector(runif(1e5,0.5,1.5))
 }
 Re_all <- Re_all[order(Re_all)]
+#Re_all <- read.csv("Re_all_2021-05-20.csv")
+#Re_all <- Re_all[,2]
+
 dispersion_parameters <- as.vector(rtnorm(1e5,mean=0.51,lower=0.49,upper=0.52))
 dispersion_parameters <- dispersion_parameters[order(dispersion_parameters)]
 write.csv(Re_all, paste0("Re_all_",Sys.Date(),".csv"))
-write.csv(dispersion_parameters, paste0("dispersion_parameters_",Sys.Date(),".csv"))
+write.csv(dispersion_parameters, paste0("dispersion_parameters",Sys.Date(),".csv"))
+
+#dispersion_parameters <- rep(0.1,10^5)
+
+#dispersion_parameters <- rep(1,10^5)
+
+dispersion_parameters <- dispersion_parameters[order(dispersion_parameters)]
 
 # Initialize simulation
 #####
@@ -87,7 +96,8 @@ su2020_cases<- function(Re, dispersion){
         cases_d_runs[match(names(table(secondary_t[secondary_t>0&secondary_t<(max_time+0.5)])),rownames(cases_d_runs)),1] <-  cases_d_runs[match(names(table(secondary_t[secondary_t>0&secondary_t<(max_time+0.5)])),rownames(cases_d_runs)),1] + table(secondary_t[secondary_t>0&secondary_t<(max_time+0.5)])
       }
       model_outputs[Ri,]<- c(sum(seeds$seeds_d),0,R,k,NA,sum(cases_d_runs),cases_d_runs[max_time,1], cases_d_runs[,1])
-      return(model_outputs[Ri,])}
+      return(model_outputs[Ri,])
+      }
 }
 
 model_outputs <- su2020_cases(Re_all, dispersion_parameters)

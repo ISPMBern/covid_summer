@@ -9,7 +9,6 @@ library(ggpubr)
 library(grid)
 library(gridExtra)
 library(RColorBrewer)
-library(lubridate)
 library(reshape2)
 
 # COVID-19 cases observed in Summer (Jun-Sep) 2020 in Switzerland
@@ -31,10 +30,14 @@ basic_figplot <- ggplot(data=as.data.frame(NA))+
         axis.text.x = element_text(size = 6),#angle = -20),
         axis.text.y = element_text(size = 10),
         axis.title.y = element_text(size = 10),
+        title = element_text(size = 10),
         plot.tag = element_text( size = 16,  hjust = 0),
         legend.text= element_text(size = 10),
         legend.title= element_text(size = 10))+
-theme_minimal()
+  theme_minimal()+
+  theme(title = element_text(size = 8))
+        
+
 g_legend <- function(a.gplot,num){ 
   tmp <- ggplot_gtable(ggplot_build(a.gplot)) 
   leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
@@ -104,11 +107,11 @@ p_cases_frac <- basic_figplot+
                date_labels = "%b",
                limits = as_date(c(time_window[1]-1,time_window[2]+1)))+
   #guides(color = guide_legend(override.aes = list(size=3))) +
-  labs(tag="d)", x = "", y =bquote("Proportion of imports"))
-
+  labs(tag="", x = "", y =bquote("Proportion of imports"))
+ggsave(p_cases_frac, filename = paste0("abroad_frac_",format(Sys.time(), "%Y-%m-%d"), ".png"), height = 3, width = 6,  bg = "transparent")
 
 p_cases_frac_legend <- p_cases_frac
-p_cases_frac <- p_cases_frac + theme(legend.position = "none")
+p_cases_frac <- p_cases_frac + theme(legend.position = "none")+labs(tag="d)", x = "", y =bquote("Proportion of imports"))
 p_cases_frac_legend  <- g_legend(p_cases_frac_legend,1)
 
 p_cases_frac_legend <- grid.arrange(grobs = list(basic_figplot,p_cases_frac_legend),layout_matrix =  rbind(1,2))
@@ -141,57 +144,78 @@ f2_cum<- basic_figplot +
   geom_hline(yintercept=cum_final_expected[1,3], linetype="dashed", color = col_9[9]) +
   scale_y_continuous(labels=yscaling, trans = 'log10') +
   scale_color_manual(values=col_9[9], name="",label="95% CI incidence") +
-  scale_fill_manual(values=col_9[2:5],name="No. cross-border-associated cases", label= as.character(import_num)) +
-  scale_x_continuous(breaks = seq(from = 0.8, to = 1.2, by = 0.1))+
+  scale_fill_manual(values=col_9[2:5],name="", label= paste0(as.character(import_num)," imports")) +
+  scale_x_continuous(breaks = seq(from = 0.5, to = 1.5, by = 0.1))+
   theme(legend.position = "none",
         axis.title.y = element_text(margin = margin(t = 0, r = 30, b = 0, l = 0)))+
   coord_cartesian(ylim = c(10^4, 10^5)) +
   guides(color = guide_legend(override.aes = list(size=6))) +
   labs(tag=bquote(.("a)")), x = bquote(italic("R"["e"])), y =bquote("Cumulative incidence"))
 
+models_output_summary1 <- models_output_summary
+models_output_summary1[models_output_summary1$Re >1.3,c("final_incidence_ll","final_incidence_median","final_incidence_ul")] <- 10^6
 ## b) final incidence
 f2_final <- basic_figplot +
-  geom_line(data=models_output_summary, aes(x=Re, y= final_incidence_median, group=imports, color = col_9[9]),alpha=0.6)+
-  geom_ribbon(data=models_output_summary, aes( x=Re, ymin = final_incidence_ll, ymax = final_incidence_ul,fill=imports),alpha=0.4)+
+  geom_line(data=models_output_summary1, aes(x=as.numeric(Re), y= final_incidence_median, group=imports, color = col_9[9]),alpha=0.6)+
+  geom_ribbon(data=models_output_summary1, aes( x=as.numeric(Re), ymin = final_incidence_ll, ymax = final_incidence_ul,fill=imports),alpha=0.4)+
   geom_hline(yintercept=cum_final_expected[2,1], linetype="dashed", color = col_9[9]) +
   geom_hline(yintercept=cum_final_expected[2,3], linetype="dashed", color = col_9[9]) +
   scale_color_manual(values=col_9[9], label="95% CI incidence",name="") +
-  scale_fill_manual(values=col_9[2:5],name="No. cross-border-associated cases", label= as.character(import_num)) +
-  scale_x_continuous(breaks = seq(from = 0.8, to = 1.2, by = 0.1))+
+  scale_fill_manual(values=col_9[2:5],name="", label= paste0(as.character(import_num)," imports")) +
+  scale_x_continuous(breaks = seq(from = 0.5, to = 1.5, by = 0.1))+
   coord_cartesian(ylim = c(100, 10^3)) +
   guides(color = guide_legend(override.aes = list(size=6))) +
   labs(tag=bquote(.("b)")), x = bquote(italic("R"["e"])), y =bquote("Final incidence"))
 #legend
+models_output_summary1 <- rm
 legend_final_cum <- f2_final
 legend_final_cum  <- g_legend(legend_final_cum,2)
 f2_final<- f2_final + theme(legend.position = "none")
 
-#c) prior posterior distripution:
-all_simulation_5050 <- models_output[models_output$imports %in% "5050",]
-simulation_accept_5050 <- simulation_accept[simulation_accept$imports %in% "5050",]
-all_simulation_5050$class <- "prior"
-simulation_accept_5050$class <- "posterior"
-simulations_5050<- rbind(simulation_accept_5050, all_simulation_5050)
-simulations_5050$Re <- as.numeric(as.character(simulations_5050$Re))
-simulations_5050$class <- factor(simulations_5050$class, levels = c("prior","posterior"))
-prior_posterior_plot <- ggplot(simulations_5050, aes(x=Re, color=class, fill=class))+
-  geom_density( alpha=0.5)+
-  scale_color_manual(values=col_9[c(7,2)],name="", labels=c("prior ","posterior distribution"))+
-  scale_fill_manual(values=col_9[c(7,2)],name="", labels=c("prior ","posterior distribution"))+
+#c) prior posterior distribution:
+#all_simulation_5050 <- models_output[models_output$imports %in% "5050",]
+#simulation_accept_5050 <- simulation_accept[simulation_accept$imports %in% "5050",]
+prior <-as.data.frame(matrix(ncol = 1,nrow=length(Re_all)))
+prior$Re <- as.numeric(Re_all)
+prior$class <- "prior"
+prior$imports <- prior$imports1 <- as.character("prior distribution")
+prior <- prior[,-c(1)]
+#simulation_accept_5050$class <- "posterior"
+simulation_accept$class <- "posterior"
+#simulations_5050<- rbind(simulation_accept_5050, all_simulation_5050)
+#simulations_5050$Re <- as.numeric(as.character(simulations_5050$Re))
+#simulations_5050$class <- factor(simulations_5050$class, levels = c("prior","posterior"))
+posterior<- simulation_accept[,c("Re","class","imports")]
+posterior$imports <- factor(posterior$imports, levels=unique(posterior$imports)[order(unique(posterior$imports))])
+
+posterior$imports1 <- paste0("posterior distribution with ",posterior$imports, " imports")
+posterior$imports1 <- factor(posterior$imports1, levels=unique(posterior$imports1)[order(unique(posterior$imports))])
+
+prior_posterior <- rbind(prior,posterior)
+prior_posterior$imports <- factor(prior_posterior$imports1, levels=c(unique(prior$imports1),levels(posterior$imports1)))
+prior_posterior <- as.data.frame(prior_posterior)
+cols <- col_9[c(7,2:5)]
+
+prior_posterior_plot <- basic_figplot+
+  geom_density(data=prior_posterior, aes(x=as.numeric(Re),color=imports, fill=imports),alpha=0.5)+
+  scale_color_manual(values=cols,name="")+
+  scale_fill_manual(values=cols,name="")+
   theme_minimal()+
   scale_x_continuous()+
-  theme(legend.position="none")+
-  labs(tag=bquote(.("c)")),subtitle = bquote(italic("Imports") == .("5050")), x = bquote(italic("R"["e"])), y =bquote("Density"))
+  coord_cartesian(xlim = c(0.5,1.5)) +
+  labs(tag=bquote(.("")),subtitle ="", x = bquote(italic("R"["e"])), y =bquote("Density"))# bquote(italic("Imports") == .("5050"))
+ggsave(prior_posterior_plot, filename = paste0("prior_posterior_plot_",format(Sys.time(), "%Y-%m-%d"), ".png"), height = 4, width = 6,  bg = "transparent")
+
+legend_prior_posterior  <- g_legend(prior_posterior_plot,1)
+prior_posteriors <- prior_posterior_plot+theme(legend.position="none")+  labs(tag=bquote(.("c)")),subtitle ="", x = bquote(italic("R"["e"])), y =bquote("Density"))# bquote(italic("Imports") == .("5050"))
+
 
 ## d) simulations with 5050 imports
-simulation_5050_accepted <- all_simulation_5050[all_simulation_5050$simulation_accepted ==1,]
-simulation_5050_notaccepted <- all_simulation_5050[all_simulation_5050$simulation_accepted ==0,]
-
+simulation_5050_accepted <- models_output[models_output$simulation_accepted ==1 & models_output$imports =="5050",]
+simulation_5050_notaccepted <- models_output[models_output$simulation_accepted ==0& models_output$imports =="5050",]
 simulation_5050_accepted <- as.data.frame(t(simulation_5050_accepted[,c(8:129)]))
 simulation_5050_notaccepted<-as.data.frame(t(simulation_5050_notaccepted[,c(8:129)]))
-
 simulation_5050_accepted$date <- simulation_5050_notaccepted$date <- swiss_cases_su2020$date
-
 simulation_5050_accepted<- melt(simulation_5050_accepted, id.vars="date")
 simulation_5050_notaccepted<- melt(simulation_5050_notaccepted, id.vars="date")
 
@@ -206,15 +230,19 @@ f2_sim_cases <- basic_figplot +
   scale_color_manual(values=c(col_9[c(2,9)]), name="", labels=c("Accepted scenarios","Not accepted scenarios"))+
   coord_cartesian(ylim = c(0, 10^3)) +
   guides(shape = guide_legend(override.aes = list(size=3)),color = guide_legend(override.aes = list(size=6))) +
-  labs(tag=bquote(.("d)")),subtitle = bquote(italic("Imports") == .("5050")), x = "", y =bquote(.("No. cases")))
+  labs(tag=bquote(.("")),subtitle = bquote(italic("Imports") == .("5050")), x = "", y =bquote(.("No. cases")))
 #legend
+ggsave(f2_sim_cases, filename = paste0("Figure2d_",format(Sys.time(), "%Y-%m-%d"), ".png"), height = 2, width = 5,  bg = "transparent")
+f2_sim_cases <- f2_sim_cases+  labs(tag=bquote(.("d)")),subtitle = bquote(italic("Imports") == .("5050")), x = "", y =bquote(.("No. cases")))
+
+
 legend <- f2_sim_cases
 legend_sim_cases  <- g_legend(legend,2)
 f2_sim_cases <- f2_sim_cases + theme(legend.position = "none")
 
-fig2_legend <- grid.arrange(rbind(legend_final_cum, legend_sim_cases,size = "last"))
+fig2_legend <- grid.arrange(rbind(legend_final_cum, legend_prior_posterior, legend_sim_cases,size = "last"))
 
-plot_fig2 <- grid.arrange(rbind(ggplotGrob(f2_cum), ggplotGrob(prior_posterior_plot),size = "last"))
+plot_fig2 <- grid.arrange(rbind(ggplotGrob(f2_cum), ggplotGrob(prior_posteriors),size = "last"))
 fig22 <- grid.arrange(rbind(ggplotGrob(f2_final),ggplotGrob(f2_sim_cases),size = "last"))
 plot_fig2 <- grid.arrange(grobs = list(plot_fig2,fig22),layout_matrix =  cbind(1,2))
 
@@ -230,6 +258,7 @@ f2_sim_cases <- rm
 legend_sim_cases <- rm
 legend_final_cum <- rm
 
+
 #####
 
 #Supplement
@@ -238,8 +267,6 @@ legend_final_cum <- rm
 
 # Supplementary Figure 1: Visualizing cases per day with and without Influx
 #####
-
-
 plots <- list()
 for (I in 1:imports_length) {
   if(I %in% c(1,3)){
@@ -305,10 +332,33 @@ for (I in 1:imports_length){# import_num[c(1:3)]
 }
 plots[[I+1]]  <- g_legend(plots[[I+1]],2)
 sf1_sim_cases <- grid.arrange(grobs = plots[c(1:(I+1))],layout_matrix =  rbind(c(1,2,5),c(3,4,NA)))
-plots <- rm
 grid.newpage()
 ggsave(sf1_sim_cases, filename = paste0("SF1_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 5, width = 10,  bg = "transparent")
 grid.newpage()
+plots <- rm
+simulation_0_accepted <- models_output[models_output$simulation_accepted ==1 & models_output$imports =="0",]
+simulation_0_notaccepted <- models_output[models_output$simulation_accepted ==0& models_output$imports =="0",]
+simulation_0_accepted <- as.data.frame(t(simulation_0_accepted[,c(8:129)]))
+simulation_0_notaccepted<-as.data.frame(t(simulation_0_notaccepted[,c(8:129)]))
+simulation_0_accepted$date <- simulation_0_notaccepted$date <- swiss_cases_su2020$date
+simulation_0_accepted<- melt(simulation_0_accepted, id.vars="date")
+simulation_0_notaccepted<- melt(simulation_0_notaccepted, id.vars="date")
+
+sf1a_sim_cases <- basic_figplot +
+  geom_line(data=simulation_0_notaccepted, aes( x=date, y=value ,group= variable,color="Not accepted scenarios"))+
+  geom_line(data=simulation_0_accepted, aes( x=date, y=value ,group= variable,color="Accepted scenarios"))+
+  geom_point(data=swiss_cases_su2020, aes(x=date, y = cases_reported,shape=col_9[1]),color=col_9[1],size=0.8,alpha=0.5)+
+  scale_x_date(date_breaks = "1 month", 
+               date_labels = "%b",
+               limits = as_date(c(time_window[1],time_window[2])))+
+  scale_shape_discrete(name="", label="Reported cases")+
+  scale_color_manual(values=c(col_9[c(2,9)]), name="", labels=c("Accepted scenarios","Not accepted scenarios"))+
+  coord_cartesian(ylim = c(0, 10^3)) +
+  guides(shape = guide_legend(override.aes = list(size=3)),color = guide_legend(override.aes = list(size=6))) +
+  labs(tag=bquote(.("")),subtitle = bquote(italic("Imports") == .("0")), x = "", y =bquote(.("No. cases")))
+#legend
+ggsave(sf1a_sim_cases, filename = paste0("sf1a_",format(Sys.time(), "%Y-%m-%d"), ".png"), height = 2, width = 5,  bg = "transparent")
+
 
 #####
 
@@ -400,6 +450,7 @@ age_percountry<- ggplot(BAG_data_su2020, aes(x=country, y=age)) +
         panel.grid.minor = element_blank(), # get rid of minor grid
         legend.position = "none")+
   labs( x = "", y = "Age (in years)")
+ggsave(age_percountry, filename = paste0("plot_countries_age_",format(Sys.time(), "%Y-%m-%d"), ".png"), height = 4, width = 6,  bg = "transparent")
 
 age_percountry <- grid.arrange(age_percountry, ncol=1)
 age_percountry <-grobTree(age_percountry,textGrob(bquote("c)"), x = 0.02, y = 0.98))

@@ -20,11 +20,11 @@ setwd("/Users/mr19m223/Documents/COVID_projects/Epidemic_Su2020/covid_summer/dat
 KOF <- read.csv(paste0("https://datenservice.kof.ethz.ch/api/v1/public/sets/stringency_plus_web?mime=csv&df=Y-m-d.csv"))
 BAG_data_su2020 <- read.csv("BAG_data_su2020.csv",row.names = 1, header=T, sep=",")
 cases_su2020 <- read.csv("cases_su2020.csv", row.names = 1, header=T, sep=",")
-Re_all <- read.csv("Re_all_2021-04-29.csv")
-dispersion_parameters <- read.csv("dispersion_parameters_2021-04-29.csv")
-noimport_model_output <- readRDS("noimport_model_output_2021-04-29.rds")
+Re_all <- read.csv("Re_all_2021-05-20.csv")
+dispersion_parameters <- read.csv("dispersion_parameters_2021-05-20.csv")
+noimport_model_output <- readRDS("noimport_model_output_2021-05-20.rds")
 imports <- list.files( pattern="imports_model_outputs_*", full.names=TRUE, recursive=FALSE)
-imports <- imports[grepl("2021-04-29", imports)]
+imports <- imports[grepl("2021-05-20", imports)]
 import_models_output<- c()
 for (i in 1:length(imports)) {
   new <- readRDS(imports[i])
@@ -69,7 +69,7 @@ noimport_model_output <- rm
 models_output$imports <- as.numeric(models_output$imports )
 models_output$imports <- factor(models_output$imports, levels=unique(names(table(models_output$imports))[order(table(models_output$imports), decreasing = TRUE)]), ordered=TRUE)
 models_output$Re_round3 <- round(models_output$Re,3)
-models_output <- models_output[models_output$Re <=1.2 & models_output$Re >=0.8,]#should not be needed
+models_output <- models_output[models_output$Re <=1.5 & models_output$Re >=0.5,]#should not be needed
 
 # Estimating incidence
 swiss_cases_su2020$incidence <- swiss_cases_su2020$cases_reported/8697905*100000 #https://www.worldometers.info/world-population/switzerland-population/
@@ -270,7 +270,7 @@ data <- rm
 colnames(models_output_summary) <- c("imports","Re", "acceptance_score","cum_cases_ll", "cum_cases_median", "cum_cases_ul","cum_cases_min","cum_cases_max","final_incidence_ll", "final_incidence_median", "final_incidence_ul","final_incidence_min","final_incidence_max")
 models_output_summary$imports <- as.numeric(models_output_summary$imports )
 models_output_summary$imports <- factor(models_output_summary$imports, levels=unique(names(table(models_output_summary$imports))[order(table(models_output_summary$imports), decreasing = TRUE)]), ordered=TRUE)
-models_output_summary <- models_output_summary[models_output_summary$Re <=1.2 & models_output_summary$Re >=0.8,]#should not be needed
+models_output_summary <- models_output_summary[models_output_summary$Re <=1.5 & models_output_summary$Re >=0.5,]#should not be needed
 
 
 #####
@@ -291,6 +291,36 @@ round(table(BAG_data_su2020$sex[BAG_data_su2020$country=="Unknown"])/length(BAG_
 round(table(BAG_data_su2020$sex[!BAG_data_su2020$country %in%c("Switzerland","Unknown")])/length(BAG_data_su2020$sex[!BAG_data_su2020$country %in%c("Switzerland","Unknown")])*100,2)
 chisq.test(BAG_data_su2020$country_cat[BAG_data_su2020$country_cat != "Unknown" &BAG_data_su2020$sex !="Unbekannt"], BAG_data_su2020$sex[BAG_data_su2020$country_cat != "Unknown" &BAG_data_su2020$sex !="Unbekannt"], correct=FALSE)$p.value
 chisq.test(BAG_data_su2020$country_exposure_known[BAG_data_su2020$sex !="Unbekannt"], BAG_data_su2020$sex[BAG_data_su2020$sex !="Unbekannt"], correct=FALSE)$p.value
+
+# Age and most likely place of exposure
+## statistics on age and most likely place of infection
+stattest_imports<- data.frame(matrix(0, ncol =0, nrow = length(unique(BAG_data_su2020$country))-1))
+stattest_imports$country <- levels(BAG_data_su2020$country)[-1]
+stattest_imports$ttest <- 0
+
+for (i in unlist(unname(stattest_imports$country))) { # all countries but not Switzerland (national transmission)
+  test_data<- BAG_data_su2020[BAG_data_su2020$country %in% c("Switzerland", i),]
+  stattest_imports$ttest[stattest_imports$country==i] <- t.test(test_data$age~test_data$country,var.equal = FALSE)$p.value
+  stattest_imports$wilcoxtest[stattest_imports$country==i] <- wilcox.test(test_data$age~test_data$country)$p.value#https://evol.bio.lmu.de/_statgen/StatBiol/11SS/zwei-stichproben-t-test_kompakt.pdf
+  stattest_imports$ttest_less[stattest_imports$country==i] <- t.test(age ~ country, data = test_data, var.equal = TRUE, alternative = "less")$p.value
+  stattest_imports$ttest_greater[stattest_imports$country==i] <- t.test(age ~ country, data = test_data, var.equal = TRUE, alternative = "greater")$p.value
+  stattest_imports$wilcoxtest[stattest_imports$country==i] <- wilcox.test(age ~ country, data = test_data, var.equal = TRUE)$p.value
+  stattest_imports$anova[stattest_imports$country==i] <-  anova(lm(test_data$age~test_data$country))$"Pr(>F)"[1]
+}
+FUN_sig <- function(x){
+  if (is.na(x)){return(" ")}
+  else if (x =="NA"){return(" ")}
+  else if (x ==" "){return(" ")}
+  else if (as.numeric(x) <= 0.001) {return("<.001")}
+  else if (as.numeric(x) <= 0.01) {return(paste("~",round(as.numeric(x),3)))}
+  else if (as.numeric(x) > 0.01) {return(paste("~",round(as.numeric(x),3)))}
+}
+stattest_imports$ttest_pvalue <- sapply(stattest_imports$ttest , FUN_sig)
+stattest_imports$ttest_pvalue1 <- sapply(stattest_imports$ttest_var , FUN_sig)
+paste0("The age is significantly different (<.05) if not infected in Switzerland but in ",paste0(stattest_imports$country[stattest_imports$ttest<.05],collapse=", "))
+paste0("Individuals were significantly younger (<0.05) if they were not infected in Switzerland but in ",paste0(stattest_imports$country[stattest_imports$ttest_greater<.05],collapse=", "))
+paste0("Individuals were significantly older (<.05) if they were not infected in Switzerland but in ",paste0(stattest_imports$country[stattest_imports$ttest_less<.05],collapse=", "))
+
 
 # Table 2: most likely place of infection and age
 imports_country_age <- as.data.frame(matrix(ncol= 6, nrow= length(levels(BAG_data_su2020$country))+2))
@@ -313,9 +343,8 @@ for (c in (levels(BAG_data_su2020$country))){
 }
 imports_country_age[2,1] <- "Cross-border-associated"
 table2 <- xtable(imports_country_age)
-table2 <- xtable(table2,
-                 caption = "Reported SARS-CoV-2 cases during summer 2020 regarding age and most likely country of exposure.**Mandataroy quarantine did not end on the $30^{th}$ of September 2020. Abbreviation: IQR, interquartile range; No., number",
-                 label = "t2")
+table2 <- xtable(caption = "Reported SARS-CoV-2 cases during summer 2020 regarding age and most likely country of exposure.**Mandataroy quarantine did not end on 30 September, 2020. Abbreviation: IQR, interquartile range; No., number",
+                 label = "t2", table2)
 table2 <- print(table2, size = "footnotesize", include.rownames = FALSE, include.colnames = TRUE)
 
 write(table2, file = "table2.tex")
