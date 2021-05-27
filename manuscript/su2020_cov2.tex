@@ -14,6 +14,7 @@
 \usepackage{lscape}
 \usepackage{makecell}
 \usepackage{fancyhdr}
+\usepackage{amsmath}
 
 \DeclareFloatingEnvironment[name={Supplementary Figure},fileext=lsf,listname={List of Supplementary Figures}]{suppfigure}
 
@@ -41,10 +42,6 @@
 \affil[*]{Correspondence: christian.althaus@ispm.unibe.ch}
 
 
-%\renewcommand{\abstractnamefont}{\small}
-%\renewcommand{\abstracttextfont}{\footnotesize} 
-
-
 \date{}
 \pagenumbering{arabic}
 \begin{document}
@@ -52,6 +49,7 @@
 \normalsize
 \begin{abstract}
 \noindent 
+
 \textbf{Introduction:} In Switzerland, the severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) epidemic grew from a few dozen confirmed cases to several hundred cases per day during summer 2020.
 During this time, holiday travel without quarantine or having tested negative for SARS-CoV-2 was largely allowed.
 Travels to higher incidence countries might lead to more SARS-CoV-2 cases.
@@ -59,12 +57,11 @@ The impact of potential cross-border-associated cases (imports) on the national 
 Our objective was to assess the impact of imports on the SARS-CoV-2 epidemic in Switzerland during summer 2020.\\
 \textbf{Method:} We analysed individual data on confirmed SARS-CoV-2 cases reported by the Swiss Federal Office of Public Health (FOPH) from 1 June to 30 September 2020. 
 We used a stochastic branching process model that accounts for super-spreading of SARS-CoV-2 to simulate epidemic trajectories in absence and presence of cross-border-associated cases.\\
-\textbf{Results:} From June to September 2020, 23,199 SARS-CoV-2 cases were reported in Switzerland. 
+\textbf{Results:} From June to September 2020, a total of 23,199 SARS-CoV-2 cases were reported in Switzerland. 
 For 12,259 (53\%) of these cases, the most likely country of exposure was available and 3,304 (27\%) declared that exposure was most likely abroad. 
-In absence of imported cases, we estimated the effective reproduction number Re above the critical threshold of one (1.08, 95\% credible interval, CI: 1.04-1.11). 
-In contrast, we estimated Re = 0.84 (95\% CI: 0.81-0.87) if imports were taken into account.\\
-\textbf{Discussion:} In Switzerland, imports must have had a considerable impact on the national dynamics and can explain  the growth of the SARS-CoV-2 epidemic during summer 2020. 
-Our results underline the importance of improved surveillance for international travellers in order to better control the spread of SARS-CoV-2.\\ 
+Assuming that all cases were infected locally (no imported cases), we estimated the effective reproduction number $\mathcal{R}_e$ above the critical threshold of one (1.08, 95\% credible interval, CI: 1.04-1.11). 
+In contrast, we estimated $\mathcal{R}_e$ to 0.84 (95\% CI: 0.81-0.87) if imports were taken into account.\\
+\textbf{Discussion:} In Switzerland, imports have had a considerable impact on the national dynamics and can explain the growth of the SARS-CoV-2 epidemic during summer 2020. 
 
 \clearpage
 \end{abstract}
@@ -76,7 +73,7 @@ Our results underline the importance of improved surveillance for international 
 
 \rhead{Confidential, please delete!}
 \lhead{ }
-At the beginning of 2020 the severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) was spread to many countries around the world, which shortly afterwards led to the SARS-CoV-2 pandemic.\cite{worobey_emergence_2020}
+At the beginning of 2020 the severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) spread to many countries around the world, which shortly afterwards led to the SARS-CoV-2 pandemic.\cite{worobey_emergence_2020}
 Since then many have been aiming to minimise the SARS-CoV-2 cases and associated deaths.
 In spring 2020, cross-border-associated cases were most likely responsible for many local outbreaks around the wolrd.\cite{russell_effect_2021}
 With a high number of introductions, i.e., cross-border-associated cases, the local effective reproductive number $\mathcal{R}_e$ was likely overestimated.\cite{roberts_early_2011}
@@ -84,16 +81,16 @@ The $\mathcal{R}_e$ represents the average number of secondary cases per infecti
 Thus, cross-border-associated cases, i.e., new introductions, should not effect the (local) $\mathcal{R}_e$.
 For summer 2020, the impact of such cross-border-associated cases in Switzerland remained largely unknown.
 
-After unprecedented closures - closure of public institutions, leisure facilities, schools and universities, mandatory home office and closing of borders -  in April and May 2020, Switzerland and other European countries reopened their borders allowing for travel.
-Switzerland reopened borders on 15 June 2020 to EU Schengen states.\cite{federal_council_coronavirus_2020}
-With 8,5 millions citizens Switzerland is a rather small country in the heart of Europe with borders to Germany, France, Italy, Austria, and the Principality of Liechtenstein.
+After unprecedented measures - closure of public institutions, leisure facilities, schools and universities, mandatory home office and closing of borders -  in April and May 2020, Switzerland and other European countries reopened their borders allowing for travel.
+Switzerland reopened borders on 15 June 2020 to countries of the Schengen area.\cite{federal_council_coronavirus_2020}
+With 8,5 millions citizens Switzerland is a relatively small country in the heart of Europe with borders to Germany, France, Italy, Austria and Liechtenstein.
 Thus, many different countries were easily visited by the Swiss and conversely, many citizens from other countries might visited Switzerland.
-Uncontrolled border traffic might be the reason why the Swiss Federal Office of Public Health (SFOPH) reported an increase in the SARS-CoV-2 epidemic from a few dozen confirmed cases per day at the beginning of June to several hundred cases per day by the end of September 2020.
-This increase occurred despite the warm and dry weather in the northern hemisphere, which should have hindered the epidemic from spreading as fast.\cite{neher_potential_2020} 
-To note, the number of reported cases in a given area did not only depend on local transmission, but also on cross-border-associated cases.
+% Julien: how much? There must be some travailling stats somewhere
+Between June and September, 2020, the Swiss Federal Office of Public Health (SFOPH) reported a slow increase in the number of reported SARS-CoV-2 cases from a few dozen per day to several hundreds.
+%This increase occurred despite the warm and dry weather in the northern hemisphere, which should have hindered the epidemic from spreading as fast.\cite{neher_potential_2020} 
 
-In the absence of travel restrictions, countries had to expect cross-border-associated cases.\cite{russell_effect_2021} 
-A phylogenetic analysis proved the assessment of cross-border-associated cases.\cite{hodcroft_emergence_2020}
+In the absence of travel restrictions, cross-border-associated cases are to be expected.\cite{russell_effect_2021} 
+A phylogenetic analysis assessed the occurence of cross-border-associated cases.\cite{hodcroft_emergence_2020}
 In summer 2020, the SARS-CoV-2 variant, 20E (EU1), that most likely originated in Spain spread multiple times to several other countries including Switzerland.\cite{hodcroft_emergence_2020}
 It revealed failures in travel control during the pandemic, e.g. there were travels to higher incidence countries without adequate contact tracing and containment.\cite{hodcroft_emergence_2020}
 
@@ -112,74 +109,75 @@ For the purpose of this study, we used individual data on positive cases reporte
 Data included for each case: age, sex, date of diagnosis or registration, and the most likely country of exposure, i.e., a country where they had been within the last 14 days before they got tested or began to have symptoms.
 We considered the 23 most frequently reported countries of exposure including Switzerland.
 Other countries (mentioned less than ten times) were grouped to 'others'.
-We grouped individuals into three categories based on their age: $<$21 years, 21-64 years and older adults $>$64 years.
+We grouped individuals into three categories based on their age: $<$21 years, 21-64 years and  $>$64 years.
 
 \subsection{Inferring growth rates and $\mathcal{R}_e$}\label{marker}
-We fitted a negative binomial generalised linear model to the daily number of reported cases of SARS-CoV-2 infections starting on 1 June to 30 September 2020. 
-Thus, we assumed a constant growth rate for the study period.
-Growth rate, $r$, and reproductive number can be derived from each other taking into account the generation time, i.e. time between the infection of a primary case and one of its secondary cases.\cite{svensson_note_2007}
-To calculate $\mathcal{R}_e$ from $r$, we used a calculation that was derived to calculated the basic reproduction number $\mathcal{R}_0$ from r.
-This eauation could be made as potential acquired immunity was minimal during the time of interest in Switzerland.
-Until 31 May 2020, 30,883 SARS-CoV-2 cases were reported by the SFOPH.\cite{federal_office_of_public_health_coronavirus_nodate}
-We assumed a gamma distributed generation time with shape $\alpha$ and rate $\beta$.
-The value of  $\mathcal{R}_e$ was given by \[ (1 + \frac{r}{\beta} )^\alpha.\cite{wallinga_how_2007,krauer_heterogeneity_2016} \]
-For SARS-CoV-2, a mean generation time  of $\mu= 5.2$ days and a standard deviation of $\sigma = 1.72$ was estimated.\cite{ganyani_estimating_2020}
+We fitted a negative binomial generalised linear model to the daily number of reported cases of SARS-CoV-2 infections $y$ starting on 1 June to 30 September 2020:
+\begin{equation}
+	\log(\text E(y|t)) = a + r t,
+\end{equation}
+where $a$ is an intercept, $r$ is a growth rate and $t$ is the time in days.
+Thus, we estimated a constant growth rate $r$ for the whole study period.
+Growth rate and reproductive number can be derived from each other taking into account the generation time, i.e. time between the infection of a primary case and one of its secondary cases.\cite{wallinga_how_2007,krauer_heterogeneity_2016,svensson_note_2007}
+This approach assumes that acquired immunity was minimal during the period of interest, and that  the reporting rate was stable.
+%Until 31 May 2020, 30,883 SARS-CoV-2 cases were reported by the SFOPH.\cite{federal_office_of_public_health_coronavirus_nodate}
+We assumed a gamma distributed generation time with shape $\alpha$ and rate $\beta$, leading to the relation:
+\begin{equation}
+	\mathcal{R}_e = (1 + \frac{r}{\beta} )^\alpha.
+\end{equation}
+For SARS-CoV-2, a mean generation time of $\mu= 5.2$ days with a standard deviation of $\sigma = 1.72$ was reported.\cite{ganyani_estimating_2020}
 Parameters $\alpha$ (gamma shape) and $\beta$  (gamma rate) were given by $\mu$ and $\sigma$ as $\frac{\mu^2}{\sigma^2 }$ and $\frac{\mu}{\sigma^2}$, respectively.
 
-\subsection{Epidemic simulation}
-We simulated epidemics for 1 June to 30 September 2020 using a stochastic branching process model that accounts for super-spreading in transmission of SARS-CoV-2.
-The distribution of secondary cases was described with a negative binomial distribution with a mean of $\mathcal{R}_e$ and a variance of $\frac{\mathcal{R}_e}{1+\frac{\mathcal{R}_e}{k}}$ where $k$ was the over-dispersion parameter.
+\subsection{Epidemic simulations}
+We simulated epidemics for 1 June to 30 September 2020 using a stochastic branching process model that accounts for super-spreading in transmission of SARS-CoV-2.\cite{riou_pattern_2020}
+The branching process was based on a negative-binomial distribution for the distribution of secondary cases, with a mean of $\mathcal{R}_e$ and over-dispersion parameter $k$.
+%a variance of $\frac{\mathcal{R}_e}{1+\frac{\mathcal{R}_e}{k}}$ where $k$ is the over-dispersion parameter.
+The generation time for each transmission event was sampled from a gamma distribution as described in the previous section.
 
-Within our branching process model we varied the over-dispersion parameter $k$, $\mathcal{R}_e$, seeds, and number of cross-border-associated cases (Table \ref{t1}).
-Firstly, with the basic branching process model that assumed no cross-border-associated cases we simulated $10^5$ trajectories.
-The simulations were initiated using different numbers of cases, i.e seeds, for 25 to 31 May 2020.
-Values were derived from the fitted a negative binomial model of reported SARS-CoV-2 cases with a 95\% credible interval (CI) of estimated cases per day (see \ref{marker}).
-From these estimated cases per day, we made range of the minimum and maximum number of potential cases per day, i.e., 12 cases to 33 cases per day. 
-For each trajectory, cases per day were randomly sampled with replacements from the range of 12 to 33 cases per day.
-Resulting in seeds from 94 to 222 cases that were distributed over seven days before simulations started (Table \ref{t1}).
-To note, the SFOPH reported 126 cases from 25 to 31 May 2020.
-Further, the over-dispersion was randomly sampled for each trajectory from a normal distribution with a mean of 0.51 and a range of 0.49 to 0.52 (Table \ref{t1}).\cite{laxminarayan_epidemiology_2020}
-In a sensitivity analysis, two additional branching process models were performed with an over-dispersion parameter of 0.1 and 1.\cite{taube_open-access_2021}
+Within our branching process model we considered different values for $\mathcal{R}_e$, for $k$ and for the seed -- the number of infectious individuals during the week preceding the start of the simulation (Table \ref{t1}).
+We considered a wide range of values for $\mathcal{R}_e$, from 0.5 to 1.5.
+For $k$, we considered values between 0.49 and 0.5 as estimated from contact tracing data in India\cite{laxminarayan_epidemiology_2020}, and in sensitivity analyses we also considered values of 0.1 and 1.\cite{taube_open-access_2021}
+For the seed, we used the estimate of the $E(y|t))$ for $t_-7$-$t_-1$ in equation 1) with its 95\% confidence interval, resulting in values of 12 to 33 cases per day.
+For each trajectory seeds for $t_-7$-$t_-1$  were randomly selected from a uniform distribution ranging from 12 to 33 cases per day.
+This resulted in a total of 94 to 222 cases from 25 to 31 May 2020, where the SFOPH reported 126 cases in Switzerland this week.
 
-Onwards local transmission was simulated using $10^5$ uniquely and uniformly distributed $\mathcal{R}_e$ values from 0.5 to 1.5 (prior distribution of $\mathcal{R}_e$; Figure \ref{f1}).
-Generation time for each case, i.e., time until transmitting, was derived from the gamma distribution (see \ref{marker}).
+The simulations proceeded as follows.
+Firstly, we simulated $10^5$ epidemic trajectories with the branching process model, randomly sampling parameter values in each iteration, except for the number of cross-border-associated cases that was fixed to 0.
+These trajectories only accounted for local transmission.
+We removed trajectories leading to a cumulative incidence over 10$^6$ (43 times more than the 23,199 cases reported over the period).
 
-Secondly, cross-border-associated cases were added to the basic branching process model assumes no cross-border-associated cases on the day that they were tested.
-Cross-border-associated cases were equally likely to transmit, i.e., initiating new branches of local transmission, as all other cases (Figure \ref{f1}d).
+Secondly, we considered cross-border-associated cases.
+In a baseline scenario with no cross-border-associated cases, the trajectories were kept as such.
+In other scenarios, cross-border-associated cases were added to each trajectory according to the date of test.
+Cross-border-associated cases were equally likely to transmit, initiating new branches of local transmission as all other cases (Figure \ref{f1}d).
+The SFOPH reported 3,304 of such cases during the study period, but the information on the country of exposure was only available for 12,259 out of 23,199 (52\% equals the weighing factor), i.e, 10,940 missings.
+We thus considered three different scenarios for the total number of cross-border-associated cases: 3,359 (weighning of actual reports), 5,050 (weighning and assuming 2/3 of cases with missing exposure were exposed abroad) and 7,573 (weighning and assuming 3/2 of cases with missing exposure were exposed abroad).
 
-Due to missing reports of countries of exposure (10,940 out of 23,199, 47\%), reported numbers of cross-border-associated cases (3,304) were extrapolated.
-We considered four scenarios with different numbers of cross-border-associated cases.
-More precisely, we multiplied the reported cross-border-associated cases on the day of report by 0, 2/3, 1, and 3/2:
-\begin{small} \[ 1+ {\frac{\Sigma~reported ~country ~of ~exposure }{\Sigma~all ~reported ~cases}}\] \end{small} (Table \ref{t1}; (Figure \ref{f1}d).
-\textcolor{red}{Finally, all simulations were limited to a cumulative incidence of $10^6$ during the time of interest.
-The SFOPH reported 23,199 cases for the period from June to September 2020 which is 43 times less than our limitation.}
 
 \begin{table*}
+	\caption{Prior distributions of the parameters used to simulate the epidemic trajectories.}%
+	\label{t1}
 \begin{tabular}{clll}
 	\hline
 	Parameter & Description & Values considered & Sampling strategy\\
 	\hline
 	$\mathcal{R}_e$ & Effective reproductive number & 0.5 - 1.5 & $10^5$ uniformly distributed\\
 	$k$ & Over-dispersion parameter & 0.49 - 0.52 & $10^5$ normally distributed*\\
-	$n$ & Seeds & 12 - 32 per day & for 7 days before simulation start\\
+	$n$ & Seeds & 12 - 32 per day & uniformly distributed\\
 	$I$ & Imports & 0; 3359; 5050; 7573 & four scenarios**\\
-	$Z$ & Limitation & $10^6$ & Maximum of cumulative incidence***\\
 	\hline
 \end{tabular}
-\caption{Summary of parameter values used to simulate epidemic trajectories. *Normal distribution with a mean of 0.51. **3,304 reported cross-border-associated cases were weighted due to missing data and multiplied with 0, 2/3, 1, and 1.5. ***The SFOPH reported 23,199 cases for the period from June to September 2020.\\}\ 
-\label{t1}
+
 \end{table*}
 
-\subsection{Statistics}
-Simulated epidemic trajectories were validated when cumulative incidence and final incidence were within 95\%-CIs of expectations (Figure \ref{f2}a,b).
-The expected scenarios for cumulative incidence and final incidence were estimated using $10^4$ simulations of random negative binomial models, where the size was derived from the standard error of the model of reported SARS-CoV-2 cases and a $\mu$ of reported cases.
-To simulate the cumulative incidence all reported cases from 1 June to 30 September 2020 were used.
-To simulate the final incidence only reported cases form the last week were used, from 24 to 30 September, 2020, and the result was divided by seven.
-Then 95\%-CIs were calculated for cumulative incidence and final incidence. 
-Finally, each simulated epidemic trajectory was accepted if both final incidence and cumulative incidence were within 95\%-CIs of the expectation.
+\subsection{Inference}
+Following the principles of approximate Bayesian computation (ABC), simulated epidemic trajectories were rejected when the cumulative incidence and final incidence fell outside of a predefined range.
+The predefined range for cumulative incidence and final incidence were constructed using SFOPH reports on confirmed cases.
+We used $10^4$ simulations of random negative binomial model to obtain 95\% prediction intervals of (1) the cumulative incidence of all reported cases from 1 June to 30 September 2020, and (2) the final incidence from 24 to 30 September 2020 divided by 7.
+The random negative binomial model was calibrated with the standard error of the (1) fitted negative binomial model of reported SARS-CoV-2 cases and (1) the cumulutative incidence for the period of interest or (2) the cumulutative incidence for the last seven days.
 
-The incidence of reported cases was calculated for each day including one week, i.e. mean of three days before and after the date of interest.
-The estimated mean of incidence was divided by 8,697,905 (number of Swiss citizens see \href{https://www.worldometers.info/world-population/switzerland-population/}{here}) and multiplied by 100,000.
+%The incidence of reported cases was calculated for each day including one week, i.e. mean of three days before and after the date of interest.
+%The estimated mean of incidence was divided by 8,697,905 (number of Swiss citizens see \href{https://www.worldometers.info/world-population/switzerland-population/}{here}) and multiplied by 100,000.
 
 All analyses were preformed using $R ~v.4.0$ with following packages \textcolor{red}{\texttt{MASS, MCMCglmm, doParallel, foreach, lubridate, reshape2, ggplot2, ggpubr, grid, gridExtra }}.\cite{r_core_team_r_2020,venables_modern_2002}
 
