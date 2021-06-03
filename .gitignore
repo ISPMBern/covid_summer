@@ -1,6 +1,7 @@
 #specific for this folder
 Backups/
 data/
+presentations/
 .DS_Store
 *_data_prep.R
 BAG_data_su2020.csv
@@ -19,6 +20,7 @@ BAG_data_su2020.csv
 *.fdb_latexmk
 *.bbl
 *.blg
+*.fls
 
 # Session Data files
 *.RData

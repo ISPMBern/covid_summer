@@ -13,9 +13,10 @@ library(MCMCglmm)
 set.seed(60321)
 
 # COVID-19 cases observed in Summer (Jun-Sep) 2020 in Switzerland
-setwd("/Users/mr19m223/Documents/COVID_projects/Epidemic_Su2020/covid_summer/data")
+setwd("/Users/mr19m223/Documents/COVID_projects/Epidemic_Su2020/covid_summer/data")#https://github.com/owid/covid-19-data/tree/master/public/data
 
 # load (additional data) data
+incidence_data <- read.csv("owid-covid-data.csv", header=T, sep=",")
 # get data from KOF (ETHZ): Stringency Index
 KOF <- read.csv(paste0("https://datenservice.kof.ethz.ch/api/v1/public/sets/stringency_plus_web?mime=csv&df=Y-m-d.csv"))
 BAG_data_su2020 <- read.csv("BAG_data_su2020.csv",row.names = 1, header=T, sep=",")
@@ -45,21 +46,24 @@ swiss_cases_su2020 <- subset(cases_su2020, date %in% seq(time_window[1],time_win
 swiss_cases_su2020$weekend <- ifelse(weekdays(swiss_cases_su2020$date) == "Saturday" | weekdays(swiss_cases_su2020$date) == "Sunday", 1, 0)
 BAG_data_su2020$date <- as_date(BAG_data_su2020$date)
 BAG_data_su2020 <- subset(BAG_data_su2020, date %in% seq(time_window[1],time_window[2],1))
+
+incidence_su2020 <- subset(incidence_data, as_date(date) %in% seq(time_window[1],time_window[2],1))
+incidence_su2020$location[incidence_su2020$location=="United Kingdom"] <- "UK"
+incidence_su2020$location[incidence_su2020$location=="Czechia"] <- "Czech Republic"
+incidence_su2020 <- subset(incidence_su2020, location %in% BAG_data_su2020$country)
+incidence_data <- rm
+
 KOF[,"date"] <- seq(as_date("2020-01-01"),(as_date("2020-01-01")+length(KOF[,"date"])-1),1)
 KOF_su2020 <- subset(KOF, date %in% seq(time_window[1],time_window[2],1))
+
 imports_d <- swiss_cases_su2020[, c("date","cases_abroad")]
 weighting <- 1+((sum(swiss_cases_su2020$cases_swiss)+sum(swiss_cases_su2020$cases_abroad))/sum(swiss_cases_su2020$cases_reported))
-imports_d$abroad_weighted <- round(imports_d$cases_abroad*weighting)
-imports_d$abroad15_weighted <- round(swiss_cases_su2020$cases_abroad*1.5*weighting)
-imports_d$abroad1_15_weighted <- round(swiss_cases_su2020$cases_abroad*(1/1.5)*weighting)
+imports_d$abroad_a <- round(imports_d$cases_abroad*weighting)
+imports_d$abroad_b <- round(swiss_cases_su2020$cases_abroad*(1/1.5)*weighting)
+imports_d$abroad_c <- round(swiss_cases_su2020$cases_abroad*1.5*weighting)
 import_num <- c(0,colSums(imports_d[,-1]))
 imports_d$date <- as_date(imports_d$date)
-import_num <- import_num[order(import_num)]
-swiss_cases_su2020$imports_propotion_all <- swiss_cases_su2020$cases_abroad/(swiss_cases_su2020$cases_reported)
-swiss_cases_su2020$imports_propotion_known <- swiss_cases_su2020$cases_abroad/(swiss_cases_su2020$cases_abroad+swiss_cases_su2020$cases_swiss)
-swiss_cases_su2020$imports_abroad_propotion_all <- imports_d$abroad_weighted/(swiss_cases_su2020$cases_reported)
-swiss_cases_su2020$imports_abroad15_propotion_all <- imports_d$abroad15_weighted/(swiss_cases_su2020$cases_reported)
-swiss_cases_su2020$imports_abroad1_15_propotion_all <- imports_d$abroad1_15_weighted/(swiss_cases_su2020$cases_reported)
+#import_num <- import_num[order(import_num)]
 
 models_output <- rbind(noimport_model_output,import_models_output)
 models_output<- as.data.frame(models_output)
@@ -67,7 +71,7 @@ models_output<- as.data.frame(models_output)
 import_models_output <- rm
 noimport_model_output <- rm
 models_output$imports <- as.numeric(models_output$imports )
-models_output$imports <- factor(models_output$imports, levels=unique(names(table(models_output$imports))[order(table(models_output$imports), decreasing = TRUE)]), ordered=TRUE)
+#models_output$imports <- factor(models_output$imports, levels=unique(names(table(models_output$imports))[order(table(models_output$imports), decreasing = TRUE)]), ordered=TRUE)
 models_output$Re_round3 <- round(models_output$Re,3)
 models_output <- models_output[models_output$Re <=1.5 & models_output$Re >=0.5,]#should not be needed
 
@@ -86,6 +90,8 @@ swiss_cases_su2020$incidence_weigthed <- sapply(swiss_cases_su2020$date, inciden
 BAG_data_su2020$country <- factor(BAG_data_su2020$country, levels=unique(names(table(BAG_data_su2020$country))[order(table(BAG_data_su2020$country), decreasing = TRUE)]), ordered=TRUE)
 BAG_data_su2020$country <- factor(BAG_data_su2020$country, levels=c(levels(BAG_data_su2020$country)[!levels(BAG_data_su2020$country) %in% c("Others","Abroad but unknown","Unknown")],c("Others","Abroad but unknown","Unknown")), ordered=TRUE)
 
+#incidence for countries where cases were exposed to SARS-2
+incidence_su2020$new_cases_smoothed_per_million
 
 ### school holidays (https://schulferien-ch.ch/schulferien-2020/) #if several dates widest range
 su2020_schoolbreak <- data.frame(label= c("AG", "AR","AI", "VL", 
@@ -153,6 +159,12 @@ su2020_quarantine <- data.frame(label= c("Greece", "France*","North Macedonia", 
                                          "Romania", "Germany", "Serbia", "Austria*", 
                                          "Croatia", "Poland","Turkey", "Spain*", 
                                          "Malta", "Czech Republic"),#* not whole country, only region
+                                country= c("Greece", "France","North Macedonia", "Netherlands", 
+                                         "Italy", "Kosovo", "Bosnia and Herzegovina", "Portugal", 
+                                         "Slovenia", "Albania", "UK", "Hungary",
+                                         "Romania", "Germany", "Serbia", "Austria", 
+                                         "Croatia", "Poland","Turkey", "Spain", 
+                                         "Malta", "Czech Republic"),
                                 start_date=c(NA,"2020-09-14", "2020-07-06","2020-09-28",
                                              "2020-09-28","2020-07-06", "2020-07-23","2020-09-28",
                                              "2020-09-28","2020-08-20", "2020-09-28", "2020-09-28",
@@ -235,11 +247,11 @@ models_output$simulation_accepted  <- sapply(1:length(models_output[,1]),FUN=acc
 simulation_accept <- models_output[models_output$simulation_accepted==1,]
 length(simulation_accept[,1])
 
-for (i_name in names(table(import_num))) {
+for (i_name in unname(unlist(import_num))) {
   print(length(simulation_accept$Re[simulation_accept$imports %in% i_name]))
 }
 
-for (i_name in names(table(import_num))) {
+for (i_name in unname(unlist(import_num))) {
   print(quantile((simulation_accept$Re[simulation_accept$imports %in% i_name]),probs))
 }
 
@@ -294,19 +306,13 @@ chisq.test(BAG_data_su2020$country_exposure_known[BAG_data_su2020$sex !="Unbekan
 
 # Age and most likely place of exposure
 ## statistics on age and most likely place of infection
-stattest_imports<- data.frame(matrix(0, ncol =0, nrow = length(unique(BAG_data_su2020$country))-1))
-stattest_imports$country <- levels(BAG_data_su2020$country)[-1]
-stattest_imports$ttest <- 0
 
-for (i in unlist(unname(stattest_imports$country))) { # all countries but not Switzerland (national transmission)
-  test_data<- BAG_data_su2020[BAG_data_su2020$country %in% c("Switzerland", i),]
-  stattest_imports$ttest[stattest_imports$country==i] <- t.test(test_data$age~test_data$country,var.equal = FALSE)$p.value
-  stattest_imports$wilcoxtest[stattest_imports$country==i] <- wilcox.test(test_data$age~test_data$country)$p.value#https://evol.bio.lmu.de/_statgen/StatBiol/11SS/zwei-stichproben-t-test_kompakt.pdf
-  stattest_imports$ttest_less[stattest_imports$country==i] <- t.test(age ~ country, data = test_data, var.equal = TRUE, alternative = "less")$p.value
-  stattest_imports$ttest_greater[stattest_imports$country==i] <- t.test(age ~ country, data = test_data, var.equal = TRUE, alternative = "greater")$p.value
-  stattest_imports$wilcoxtest[stattest_imports$country==i] <- wilcox.test(age ~ country, data = test_data, var.equal = TRUE)$p.value
-  stattest_imports$anova[stattest_imports$country==i] <-  anova(lm(test_data$age~test_data$country))$"Pr(>F)"[1]
-}
+fit1_summary <- summary(lm(as.numeric(BAG_data_su2020[,"altersjahr"])~ BAG_data_su2020[,"country"]))
+fit1 <- lm(as.numeric(BAG_data_su2020[,"altersjahr"])~ BAG_data_su2020[,"country"])
+rownames(fit1_summary$coefficients) <- c("intercept",levels(BAG_data_su2020[,"country"])[-1])
+age_summary <- as.data.frame(fit1_summary$coefficients[-1,])
+anova(fit1)
+
 FUN_sig <- function(x){
   if (is.na(x)){return(" ")}
   else if (x =="NA"){return(" ")}
@@ -315,36 +321,52 @@ FUN_sig <- function(x){
   else if (as.numeric(x) <= 0.01) {return(paste("~",round(as.numeric(x),3)))}
   else if (as.numeric(x) > 0.01) {return(paste("~",round(as.numeric(x),3)))}
 }
-stattest_imports$ttest_pvalue <- sapply(stattest_imports$ttest , FUN_sig)
-stattest_imports$ttest_pvalue1 <- sapply(stattest_imports$ttest_var , FUN_sig)
-paste0("The age is significantly different (<.05) if not infected in Switzerland but in ",paste0(stattest_imports$country[stattest_imports$ttest<.05],collapse=", "))
-paste0("Individuals were significantly younger (<0.05) if they were not infected in Switzerland but in ",paste0(stattest_imports$country[stattest_imports$ttest_greater<.05],collapse=", "))
-paste0("Individuals were significantly older (<.05) if they were not infected in Switzerland but in ",paste0(stattest_imports$country[stattest_imports$ttest_less<.05],collapse=", "))
+age_summary$lm_pvalue <- sapply(age_summary$`Pr(>|t|)` , FUN_sig)
+paste0("Individals that were exposed to SARS-CoV-2 in ",paste0(rownames(age_summary)[age_summary$lm_pvalue<.05],collapse=", ")," differed in their age significantly (<.05) compared to individuals that were only in Switzerland.")
+paste0("Individuals were significantly younger (<.05) if they were exposed to SARS-CoV-2 in ",paste0(rownames(age_summary)[age_summary$lm_pvalue<.05 & age_summary$Estimate < 0],collapse=", ")," compared to individuals that were only in Switzerland.")
+paste0("Individuals were significantly older (<.05) if they were exposed to SARS-CoV-2 in ",paste0(rownames(age_summary)[age_summary$lm_pvalue<.05 & age_summary$Estimate > 0],collapse=", ")," compared to individuals that were only in Switzerland.")
+
+paste0("Individals that were exposed to SARS-CoV-2 in ",paste0(rownames(age_summary)[age_summary$lm_pvalue<.001],collapse=", ")," differed in their age significantly (<.001) compared to individuals that were only in Switzerland.")
+paste0("Individuals were significantly younger (<.001) if they were exposed to SARS-CoV-2 in ",paste0(rownames(age_summary)[age_summary$lm_pvalue<.001 & age_summary$Estimate < 0],collapse=", ")," compared to individuals that were only in Switzerland.")
+paste0("Individuals were significantly older (<.001) if they were exposed to SARS-CoV-2 in ",paste0(rownames(age_summary)[age_summary$lm_pvalue<.001 & age_summary$Estimate > 0],collapse=", ")," compared to individuals that were only in Switzerland.")
+
 
 
 # Table 2: most likely place of infection and age
-imports_country_age <- as.data.frame(matrix(ncol= 6, nrow= length(levels(BAG_data_su2020$country))+2))
-colnames(imports_country_age) <- c("Country","No. cases","Known exposure \n\n(in %)", "Exposure abroad \n\n(in %)", "Age in years,\n\nmedian (IQR)", "Mandatory \n\nquarantine")
+imports_country_age <- as.data.frame(matrix(ncol= 7, nrow= length(levels(BAG_data_su2020$country))+2))
+colnames(imports_country_age) <- c("Country","Incidence per 10^6, median (range)", "Confirmed cases","Known exposure \n\n(in %)", "Exposure abroad \n\n(in %)", "Age in years,\n\nmedian (IQR)", "Mandatory \n\nquarantine")
 imports_country_age[,1] <- c(c("All reported cases", "Imports"),levels(BAG_data_su2020$country))
 for (c in c("All reported cases", "Imports")){
-  imports_country_age[,2][imports_country_age$Country == c] <- if(c== "All reported cases"){length(BAG_data_su2020$country)} else{sum(!BAG_data_su2020$country %in% c("Unknown","Switzerland"))}
-  imports_country_age[,3][imports_country_age$Country == c] <- if(c== "All reported cases"){" - "} else{format(round(sum(!BAG_data_su2020$country %in% c("Unknown","Switzerland"))/sum(!BAG_data_su2020$country %in% c("Unknown"))*100,2), nsmall = 2)}
-  imports_country_age[,4][imports_country_age$Country == c] <- if(c== "All reported cases"){" - "} else{format(round(sum(!BAG_data_su2020$country %in% c("Unknown","Switzerland"))/sum(!BAG_data_su2020$country %in% c("Unknown","Switzerland"))*100,2), nsmall = 2)}
-  imports_country_age[,5][imports_country_age$Country == c] <- if(c== "All reported cases"){paste0(round(quantile(BAG_data_su2020$age)[3]), " (",round(quantile(BAG_data_su2020$age)[2]),"-",round(quantile(BAG_data_su2020$age)[4]),")")} 
+  imports_country_age[,2][imports_country_age$Country == c] <- " - "
+  imports_country_age[,3][imports_country_age$Country == c] <- if(c== "All reported cases"){length(BAG_data_su2020$country)} else{sum(!BAG_data_su2020$country %in% c("Unknown","Switzerland"))}
+  imports_country_age[,4][imports_country_age$Country == c] <- if(c== "All reported cases"){" - "} else{format(round(sum(!BAG_data_su2020$country %in% c("Unknown","Switzerland"))/sum(!BAG_data_su2020$country %in% c("Unknown"))*100,2), nsmall = 2)}
+  imports_country_age[,5][imports_country_age$Country == c] <- if(c== "All reported cases"){" - "} else{format(round(sum(!BAG_data_su2020$country %in% c("Unknown","Switzerland"))/sum(!BAG_data_su2020$country %in% c("Unknown","Switzerland"))*100,2), nsmall = 2)}
+  imports_country_age[,6][imports_country_age$Country == c] <- if(c== "All reported cases"){paste0(round(quantile(BAG_data_su2020$age)[3]), " (",round(quantile(BAG_data_su2020$age)[2]),"-",round(quantile(BAG_data_su2020$age)[4]),")")} 
   else{paste0(round(quantile(BAG_data_su2020$age[!BAG_data_su2020$country %in% c("Unknown", "Switzerland")])[3]), " (",round(quantile(BAG_data_su2020$age[!BAG_data_su2020$country %in% c("Unknown", "Switzerland")])[2]),"-",round(quantile(BAG_data_su2020$age[!BAG_data_su2020$country %in% c("Unknown", "Switzerland")])[4]),")")}
-  imports_country_age[,6][imports_country_age$Country == c] <- " - "
+  imports_country_age[,7][imports_country_age$Country == c] <- " - "
 }
 for (c in (levels(BAG_data_su2020$country))){
-  imports_country_age[,2][imports_country_age$Country == c] <- sum(BAG_data_su2020$country == c)
-  imports_country_age[,3][imports_country_age$Country == c] <- if(c== "Unknown"){" - "} else{format(round(sum(BAG_data_su2020$country == c)/sum(BAG_data_su2020$country != "Unknown")*100,2), nsmall = 2)}
-  imports_country_age[,4][imports_country_age$Country == c] <- if(c %in% c("Unknown", "Switzerland")){" - "} else{format(round(sum(BAG_data_su2020$country == c)/sum(!BAG_data_su2020$country %in% c("Unknown", "Switzerland"))*100,2), nsmall = 2)}
-  imports_country_age[,5][imports_country_age$Country == c] <- paste0(round(quantile(BAG_data_su2020$age[BAG_data_su2020$country == c])[3]), " (",round(quantile(BAG_data_su2020$age[BAG_data_su2020$country == c])[2]),"-",round(quantile(BAG_data_su2020$age[BAG_data_su2020$country == c])[4]),")")
-  imports_country_age[,6][imports_country_age$Country == c] <- if(c %in% c("Unknown", "Switzerland")){" - "} else if(c%in%c("Others","Abroad but unknown") || is.na(su2020_quarantine$start_date[gsub("\\*", "\\1", su2020_quarantine$label) ==c])){" - "} else{paste0(su2020_quarantine$start_date[gsub("\\*", "\\1", su2020_quarantine$label) ==c], " - ", su2020_quarantine$end_date_dot[gsub("\\*", "\\1", su2020_quarantine$label) ==c])}
+  imports_country_age[,2][imports_country_age$Country == c] <- if(c %in% c("Unknown","Others", "Abroad but unknown")){" - "}  else{paste0(format(round(median(incidence_su2020$new_cases_smoothed_per_million[incidence_su2020$location == c]),1), nsmall = 1), " (", format(round(min(incidence_su2020$new_cases_smoothed_per_million[incidence_su2020$location == c]),1), nsmall = 1), " - ",format(round(max(incidence_su2020$new_cases_smoothed_per_million[incidence_su2020$location == c]),1), nsmall = 1), ")")}
+  imports_country_age[,3][imports_country_age$Country == c] <- sum(BAG_data_su2020$country == c)
+  imports_country_age[,4][imports_country_age$Country == c] <- if(c== "Unknown"){" - "} else{format(round(sum(BAG_data_su2020$country == c)/sum(BAG_data_su2020$country != "Unknown")*100,2), nsmall = 2)}
+  imports_country_age[,5][imports_country_age$Country == c] <- if(c %in% c("Unknown", "Switzerland")){" - "} else{format(round(sum(BAG_data_su2020$country == c)/sum(!BAG_data_su2020$country %in% c("Unknown", "Switzerland"))*100,2), nsmall = 2)}
+  imports_country_age[,6][imports_country_age$Country == c] <- paste0(round(quantile(BAG_data_su2020$age[BAG_data_su2020$country == c])[3]), " (",round(quantile(BAG_data_su2020$age[BAG_data_su2020$country == c])[2]),"-",round(quantile(BAG_data_su2020$age[BAG_data_su2020$country == c])[4]),")")
+  imports_country_age[,7][imports_country_age$Country == c] <- if(c %in% c("Unknown", "Switzerland")){" - "} else if(c%in%c("Others","Abroad but unknown") || is.na(su2020_quarantine$start_date[gsub("\\*", "\\1", su2020_quarantine$label) ==c])){" - "} else{paste0(su2020_quarantine$start_date[gsub("\\*", "\\1", su2020_quarantine$label) ==c], " - ", su2020_quarantine$end_date_dot[gsub("\\*", "\\1", su2020_quarantine$label) ==c])}
 }
 imports_country_age[2,1] <- "Cross-border-associated"
 table2 <- xtable(imports_country_age)
-table2 <- xtable(caption = "Reported SARS-CoV-2 cases during summer 2020 regarding age and most likely country of exposure.**Mandataroy quarantine did not end on 30 September, 2020. Abbreviation: IQR, interquartile range; No., number",
+table2 <- xtable(caption = "Reported SARS-CoV-2 cases during summer 2020 regarding age and most likely country of exposure.**Mandatory quarantine did not end on 30 September, 2020. Abbreviation: IQR, interquartile range",
                  label = "t2", table2)
 table2 <- print(table2, size = "footnotesize", include.rownames = FALSE, include.colnames = TRUE)
 
 write(table2, file = "table2.tex")
+
+table(incidence_su2020$location[incidence_su2020$new_cases_smoothed_per_million> incidence_su2020$new_cases_smoothed_per_million[incidence_su2020$location=="Switzerland"]])
+
+format(round(table(incidence_su2020$location[incidence_su2020$new_cases_smoothed_per_million> incidence_su2020$new_cases_smoothed_per_million[incidence_su2020$location=="Switzerland"]])/122*100,1),1)[order(format(round(table(incidence_su2020$location[incidence_su2020$new_cases_smoothed_per_million> incidence_su2020$new_cases_smoothed_per_million[incidence_su2020$location=="Switzerland"]])/122*100,1),1))]
+table3 <-format(round(table(incidence_su2020$location[incidence_su2020$new_cases_smoothed_per_million> incidence_su2020$new_cases_smoothed_per_million[incidence_su2020$location=="Switzerland"]])/122*100,1),1)
+names(table3[table3>50])
+
+quantile(table(incidence_su2020$location[incidence_su2020$new_cases_smoothed_per_million> incidence_su2020$new_cases_smoothed_per_million[incidence_su2020$location=="Switzerland"]]), probs)
+
+
