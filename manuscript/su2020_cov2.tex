@@ -168,7 +168,8 @@ Contrary, in the upper limit scenario c) cross-border cases were more likely amo
 
 \end{multicols}
 \begin{table}
-\centering\begingroup\footnotesize
+\centering
+\begingroup\footnotesize
 \begin{tabular}{clll}
 	\hline
 	Parameter & Description & Values considered & Sampling strategy\\
@@ -178,7 +179,11 @@ Contrary, in the upper limit scenario c) cross-border cases were more likely amo
 	$n$ & Seeds & 12 - 32 per day & uniformly distributed\\
 	$I$ & Imports & baseline; a); b); c) & four scenarios\\
 	\hline
-\end{tabular}\endgroup\caption{Prior distributions of the parameters used to simulate the epidemic trajectories.} \label{t1}\end{table}
+\end{tabular}
+\endgroup
+\caption{Prior distributions of the parameters used to simulate the epidemic trajectories.} 
+\label{t1}
+\end{table}
 \begin{multicols}{2}
 
 \subsection{Inference}
@@ -205,16 +210,56 @@ Of all exposures that were likely to have happened abroad 1,562 (44\%) were fema
 %\end{landscape}
 %\begin{multicols}{2}
 %\global\pdfpageattr\expandafter{\the\pdfpageattr/Rotate 0}
-\begin{table}\begingroup\footnotesize\begin{tabular}{llrllll}  \hlineCountry &\makecell{Incidence\\per $10^6$\\median (range)} &\makecell{Confirmed\\cases} &\makecell{Known\\exposure\\(in \%)} &\makecell{Cases\\abroad\\(in \%)} &\makecell{Age in years\\median (IQR)} &\makecell{Mandatory\\quarantine} \\   \hlineAll reported cases &  -  & 23199 &  -  &  -  & 34 (24-50) &  -  \\   Cross-border-associated &  -  & 3304 & 26.95 & 100.00 & 31 (23-48) &  -  \\   Switzerland & 17.1 (1.7 - 50.9) & 8955 & 73.05 &  -  & 35 (24-51) &  -  \\   France & 15.4 (4.8 - 181.3) & 650 & 5.30 & 19.67 & 29 (23-41) & 2020-09-14 - ** \\   Croatia & 19.6 (0.0 - 68.2) & 419 & 3.42 & 12.68 & 24 (21-28) & 2020-09-07 - ** \\   Kosovo & 59.9 (3.3 - 122.8) & 309 & 2.52 & 9.35 & 49 (31-61) & 2020-07-06 - ** \\   Italy & 5.0 (2.9 - 29.1) & 301 & 2.46 & 9.11 & 32 (24-46) & 2020-09-28 - ** \\   Germany & 8.0 (2.7 - 23.7) & 184 & 1.50 & 5.57 & 37 (26-51) &  -  \\   Turkey & 14.8 (10.4 - 19.9) & 169 & 1.38 & 5.12 & 39 (26-53) &  -  \\   Serbia & 19.1 (4.8 - 63.6) & 153 & 1.25 & 4.63 & 46 (28-60) & 2020-07-06 - ** \\   Spain & 49.2 (5.4 - 242.0) & 136 & 1.11 & 4.12 & 30 (23-42) & 2020-08-08 - ** \\   Malta & 44.0 (0.0 - 137.5) & 125 & 1.02 & 3.78 & 20 (19-24) & 2020-08-20 - ** \\   Greece & 5.2 (0.5 - 31.6) & 116 & 0.95 & 3.51 & 29 (25-37) &  -  \\   Portugal & 31.7 (16.7 - 71.1) & 116 & 0.95 & 3.51 & 36 (25-49) & 2020-09-28 - ** \\   Austria & 12.8 (2.6 - 81.2) &  65 & 0.53 & 1.97 & 35 (28-50) & 2020-09-14 - ** \\   North Macedonia & 62.6 (21.7 - 77.2) &  59 & 0.48 & 1.79 & 61 (50-65) & 2020-07-06 - ** \\   Albania & 36.9 (5.4 - 55.5) &  57 & 0.46 & 1.73 & 38 (27-48) & 2020-08-20 - ** \\   Bosnia and Herzegovina & 73.9 (4.2 - 110.1) &  56 & 0.46 & 1.69 & 46 (30-60) & 2020-07-23 - ** \\   Hungary & 1.8 (0.3 - 91.0) &  38 & 0.31 & 1.15 & 28 (23-34) & 2020-09-28 - ** \\   Netherlands & 15.8 (3.0 - 172.4) &  34 & 0.28 & 1.03 & 30 (23-46) & 2020-09-28 - ** \\   Poland & 12.4 (6.8 - 37.1) &  24 & 0.20 & 0.73 & 32 (31-44) &  -  \\   Czech Republic & 19.8 (4.0 - 204.2) &  22 & 0.18 & 0.67 & 24 (20-33) & 2020-09-14 - ** \\   Romania & 59.8 (8.0 - 82.9) &  13 & 0.11 & 0.39 & 40 (26-52) & 2020-07-23 - ** \\   Slovenia & 8.7 (0.3 - 68.4) &  11 & 0.09 & 0.33 & 30 (18-34) & 2020-09-28 - ** \\   UK & 14.9 (5.2 - 91.8) &  11 & 0.09 & 0.33 & 30 (20-43) & 2020-09-28 - ** \\   Others &  -  & 157 & 1.28 & 4.75 & 37 (25-53) &  -  \\   Abroad but unknown &  -  &  79 & 0.64 & 2.39 & 33 (26-49) &  -  \\   Unknown &  -  & 10940 &  -  &  -  & 35 (25-51) &  -  \\    \hline\end{tabular}\endgroup\caption{Confirmed SARS-CoV-2 cases during summer 2020 regarding age and most likely country of exposure.**Mandatory quarantine did not end on 30 September 2020. Abbreviation: IQR, interquartile range} \label{t2}\end{table}
+\begin{table}
+\begingroup\footnotesize
+\begin{tabular}{llrllll}
+  \hline
+Country &\makecell{Incidence\\per $10^6$\\median (range)} &\makecell{Confirmed\\cases} &\makecell{Known\\exposure\\(in \%)} &\makecell{Cases\\abroad\\(in \%)} &\makecell{Age in years\\median (IQR)} &\makecell{Mandatory\\quarantine} \\ 
+  \hline
+All reported cases &  -  & 23199 &  -  &  -  & 34 (24-50) &  -  \\ 
+  Cross-border-associated &  -  & 3304 & 26.95 & 100.00 & 31 (23-48) &  -  \\ 
+  Switzerland & 17.1 (1.7 - 50.9) & 8955 & 73.05 &  -  & 35 (24-51) &  -  \\ 
+  France & 15.4 (4.8 - 181.3) & 650 & 5.30 & 19.67 & 29 (23-41) & 2020-09-14 - ** \\ 
+  Croatia & 19.6 (0.0 - 68.2) & 419 & 3.42 & 12.68 & 24 (21-28) & 2020-09-07 - ** \\ 
+  Kosovo & 59.9 (3.3 - 122.8) & 309 & 2.52 & 9.35 & 49 (31-61) & 2020-07-06 - ** \\ 
+  Italy & 5.0 (2.9 - 29.1) & 301 & 2.46 & 9.11 & 32 (24-46) & 2020-09-28 - ** \\ 
+  Germany & 8.0 (2.7 - 23.7) & 184 & 1.50 & 5.57 & 37 (26-51) &  -  \\ 
+  Turkey & 14.8 (10.4 - 19.9) & 169 & 1.38 & 5.12 & 39 (26-53) &  -  \\ 
+  Serbia & 19.1 (4.8 - 63.6) & 153 & 1.25 & 4.63 & 46 (28-60) & 2020-07-06 - ** \\ 
+  Spain & 49.2 (5.4 - 242.0) & 136 & 1.11 & 4.12 & 30 (23-42) & 2020-08-08 - ** \\ 
+  Malta & 44.0 (0.0 - 137.5) & 125 & 1.02 & 3.78 & 20 (19-24) & 2020-08-20 - ** \\ 
+  Greece & 5.2 (0.5 - 31.6) & 116 & 0.95 & 3.51 & 29 (25-37) &  -  \\ 
+  Portugal & 31.7 (16.7 - 71.1) & 116 & 0.95 & 3.51 & 36 (25-49) & 2020-09-28 - ** \\ 
+  Austria & 12.8 (2.6 - 81.2) &  65 & 0.53 & 1.97 & 35 (28-50) & 2020-09-14 - ** \\ 
+  North Macedonia & 62.6 (21.7 - 77.2) &  59 & 0.48 & 1.79 & 61 (50-65) & 2020-07-06 - ** \\ 
+  Albania & 36.9 (5.4 - 55.5) &  57 & 0.46 & 1.73 & 38 (27-48) & 2020-08-20 - ** \\ 
+  Bosnia and Herzegovina & 73.9 (4.2 - 110.1) &  56 & 0.46 & 1.69 & 46 (30-60) & 2020-07-23 - ** \\ 
+  Hungary & 1.8 (0.3 - 91.0) &  38 & 0.31 & 1.15 & 28 (23-34) & 2020-09-28 - ** \\ 
+  Netherlands & 15.8 (3.0 - 172.4) &  34 & 0.28 & 1.03 & 30 (23-46) & 2020-09-28 - ** \\ 
+  Poland & 12.4 (6.8 - 37.1) &  24 & 0.20 & 0.73 & 32 (31-44) &  -  \\ 
+  Czech Republic & 19.8 (4.0 - 204.2) &  22 & 0.18 & 0.67 & 24 (20-33) & 2020-09-14 - ** \\ 
+  Romania & 59.8 (8.0 - 82.9) &  13 & 0.11 & 0.39 & 40 (26-52) & 2020-07-23 - ** \\ 
+  Slovenia & 8.7 (0.3 - 68.4) &  11 & 0.09 & 0.33 & 30 (18-34) & 2020-09-28 - ** \\ 
+  UK & 14.9 (5.2 - 91.8) &  11 & 0.09 & 0.33 & 30 (20-43) & 2020-09-28 - ** \\ 
+  Others &  -  & 157 & 1.28 & 4.75 & 37 (25-53) &  -  \\ 
+  Abroad but unknown &  -  &  79 & 0.64 & 2.39 & 33 (26-49) &  -  \\ 
+  Unknown &  -  & 10940 &  -  &  -  & 35 (25-51) &  -  \\ 
+   \hline
+\end{tabular}
+\endgroup
+\caption{Confirmed SARS-CoV-2 cases during summer 2020 regarding age and most likely country of exposure.**Mandatory quarantine did not end on 30 September 2020. Abbreviation: IQR, interquartile range} 
+\label{t2}
+\end{table}
 \begin{multicols}{2}
 
 The study population was 34 (interquartile range (IQR): 24-50) years and individuals that had an exposure abroad were 31 (IQR: 23-48) years (Table \ref{t2}).
 Individuals who reported that Switzerland was the only country they had visited within the last 14 days were 35 (IQR: 24-51) years.
-Different age categories were more likely to visit some countries during summer (Table \ref{t2}; Supplementary Figure \ref{sf1}).
+Different age categories were more likely to visit some countries during summer (Table \ref{t2}; Supplementary Figure \ref{sf2}).
 Individuals were significantly younger ($<.05$) if they were exposed to SARS-CoV-2 in France, Croatia, Turkey, Serbia, Greece, Portugal, Albania, Hungary, Poland, Czech Republic, Romania, Slovenia, or the UK compared to individuals that were only in Switzerland.
 Contrary, individuals were significantly older ($<.05$) if they were exposed to SARS-CoV-2 in Kosovo, Italy, Germany, Spain, Malta, Austria, North Macedonia, Bosnia and Herzegovina, Netherlands, or in other countries, abroad but unknown, or generally unknown compared to individuals that were only in Switzerland.
+Tendency of crossing borders was similar regarding residency of Swiss cases (Supplementary Figure \ref{sf3}).
 
-The incidence of 22 countries - where Swiss cases were exposed to SARS-CoV-2 - was for 81 (95\%-CI 7-122) out of 122 days higher as in Switzerland (Table \ref{t2}).
+The incidence of 22 countries - where Swiss cases were exposed to SARS-CoV-2 - was for 81 (95\%-CI 7-122) out of 122 days higher as in Switzerland (Table \ref{t2}; Supplementary Figure \ref{sf1}).
 At the beginning of June 2020, none of the 22 countries with at least a dozen returnees with a SARS-CoV-2 infection between June and September was on the list where returnees had to do quarantine.
 In July 2020 the list was including five countries of 22 countries.
 In August and September 3 respectively 10 additional countries were added to the list.

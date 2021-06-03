@@ -355,7 +355,7 @@ for (c in (levels(BAG_data_su2020$country))){
 }
 imports_country_age[2,1] <- "Cross-border-associated"
 table2 <- xtable(imports_country_age)
-table2 <- xtable(caption = "Reported SARS-CoV-2 cases during summer 2020 regarding age and most likely country of exposure.**Mandatory quarantine did not end on 30 September, 2020. Abbreviation: IQR, interquartile range",
+table2 <- xtable(caption = "Confirmed SARS-CoV-2 cases during summer 2020 regarding age and most likely country of exposure.**Mandatory quarantine did not end on 30 September 2020. Abbreviation: IQR, interquartile range",
                  label = "t2", table2)
 table2 <- print(table2, size = "footnotesize", include.rownames = FALSE, include.colnames = TRUE)
 
