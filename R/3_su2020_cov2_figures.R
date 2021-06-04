@@ -191,13 +191,13 @@ f2_cum <- f2_cum+ labs(tag=bquote(.("a)")))
 prior <-as.data.frame(matrix(ncol = 1,nrow=length(Re_all)))
 prior$Re <- as.numeric(Re_all)
 prior$class <- "prior"
-prior$imports <- prior$imports1 <- as.character("prior distribution")
+prior$imports1 <- prior$imports <- as.character("prior distribution")
 prior <- prior[,-c(1)]
 simulation_accept$class <- "posterior"
 posterior<- simulation_accept[,c("Re","class","imports")]
 posterior$imports <- factor(posterior$imports, levels=unique(posterior$imports)[order(unique(posterior$imports))])
 
-posterior$imports_name[posterior$imports==levels(posterior$imports)[1]] <- "baseline scenario"
+posterior$imports_name[posterior$imports==levels(posterior$imports)[1]] <- "the baseline scenario"
 posterior$imports_name[posterior$imports==levels(posterior$imports)[3]] <- "a)"
 posterior$imports_name[posterior$imports==levels(posterior$imports)[2]] <- "b)"
 posterior$imports_name[posterior$imports==levels(posterior$imports)[4]] <- "c)"
@@ -207,7 +207,7 @@ posterior$imports_name <- NULL
 posterior$imports1 <- factor(posterior$imports1, levels=unique(posterior$imports1)[order(unique(posterior$imports))])
 
 prior_posterior <- rbind(prior,posterior)
-prior_posterior$imports <- factor(prior_posterior$imports1, levels=c("prior distribution","posterior distribution for baseline scenario","posterior distribution for a)","posterior distribution for b)","posterior distribution for c)"))
+prior_posterior$imports <- factor(prior_posterior$imports1, levels=c("prior distribution","posterior distribution for the baseline scenario","posterior distribution for a)","posterior distribution for b)","posterior distribution for c)"))
 prior_posterior <- as.data.frame(prior_posterior)
 cols <- col_9[c(9,7,3:5)]
 

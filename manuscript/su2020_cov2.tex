@@ -58,7 +58,7 @@ Our objective was to assess the impact of imports on the SARS-CoV-2 epidemic in 
 We used a stochastic branching process model that accounts for super-spreading of SARS-CoV-2 to simulate epidemic trajectories in absence and presence of cross-border-associated cases.\\
 \textbf{Results:} From June to September 2020, a total of 23,199 SARS-CoV-2 cases were reported in Switzerland. 
 For 12,259 (53\%) of these cases, the most likely country of exposure was available and 3,304 (27\%) declared that exposure was most likely abroad. 
-Assuming that all cases were infected locally (no imports), we estimated the effective reproduction number $\mathcal{R}_e$ above the critical threshold of one (1.08, 95\%-credible interval, CI: 1.05-1.11).
+Assuming that all cases were infected locally (no imports), we estimated the effective reproduction number $\mathcal{R}_e$ above the critical threshold of one (1.08, 95\%-credible interval, CrI: 1.05-1.11).
 In contrast, we estimated $\mathcal{R}_e$ to 0.84 (95\%-CI: 0.81-0.87) if imports were taken into account.\\
 \textbf{Discussion:} In Switzerland, imports have had a considerable impact on the national dynamics and can explain the growth of the SARS-CoV-2 epidemic during summer 2020. 
 
@@ -80,15 +80,19 @@ With a high number of introductions, i.e., cross-border-associated cases, the lo
 The $\mathcal{R}_e$ represents the average number of secondary cases per infectious case in a population with a given state of susceptibility and particular measures of prevention and control in specific place excluding new introductions.
 Thus, cross-border-associated cases should not effect the (local) $\mathcal{R}_e$.
 However, estimations of $\mathcal{R}_e$ do generally not exclude cross-border-associated cases.
-Therefore, the impact of cross-border-associated cases in Switzerland during summer 2020 remained largely unknown.
+Between June and September, 2020, the Swiss Federal Office of Public Health (SFOPH) reported a slow increase in the number of reported SARS-CoV-2 cases from a few dozen per day to several hundreds.
+%This increase occurred despite the warm and dry weather in the northern hemisphere, which should have hindered the epidemic from spreading as fast.\cite{neher_potential_2020} 
+The impact of cross-border-associated on the increased SARS-CoV-2 incidence in Switzerland in summer 2020 remained largely unknown.
 
 After unprecedented measures - closure of public institutions, leisure facilities, schools and universities, mandatory home office and closing of borders -  in April and May 2020, Switzerland and other European countries reopened their borders allowing for travel.
 Switzerland reopened borders on 15 June 2020 to countries of the Schengen area.\cite{federal_council_coronavirus_2020}
 With 8,5 millions citizens Switzerland is a relatively small country in the heart of Europe with borders to Germany, France, Italy, Austria and Liechtenstein.
-Thus, many different countries were easily visited by the Swiss and conversely, many citizens from other countries might visited Switzerland.
-% Julien: how much? There must be some travailling stats somewhere. Martina: https://www.hotelleriesuisse.ch/de/branche-und-politik/kennzahlen/wirtschaftskennzahlen/download-51478E8B-2033-4350-AE2D-AFDA7D9CEBEE.secure
-Between June and September, 2020, the Swiss Federal Office of Public Health (SFOPH) reported a slow increase in the number of reported SARS-CoV-2 cases from a few dozen per day to several hundreds.
-%This increase occurred despite the warm and dry weather in the northern hemisphere, which should have hindered the epidemic from spreading as fast.\cite{neher_potential_2020} 
+Moreover, Swiss like to travel and many different countries were easily visited by the Swiss and conversely, many citizens from other countries might visited Switzerland.
+Around 80\% said that traveling is part of their holidays.\cite{heim_dreivon_2020}
+Before the SARS-CoV-2 pandemic, around 49\% planned to travel abroad, this reduced to 15\% in June 2020.\cite{bosshardt_schweiz_2020}
+For many Swiss, the SARS-CoV-2 incidence of holiday destinations was crucial for their decision.\cite{bosshardt_schweiz_2020}
+A survey study showed that around 4\% were planning to go to Germany, 3\% to France and 2\% to Italy or Austria.\cite{bosshardt_schweiz_2020}
+More distant holiday destinations like Spain or Greece was planned to visit by less than 1\%.\cite{bosshardt_schweiz_2020}
 
 In the absence of travel restrictions, cross-border-associated cases are to be expected.\cite{russell_effect_2021} 
 A phylogenetic analysis assessed the occurrence of cross-border-associated cases.\cite{hodcroft_emergence_2020}
@@ -115,9 +119,8 @@ We considered the 23 most frequently reported countries of exposure including Sw
 Other countries (mentioned less than ten times) were grouped to 'others'.
 We preformed a linear regression to estimate the differences in age (in 1 years steps) between individuals that had been exposed in different countries.
 Further, we grouped individuals into three categories based on their age: $<$21 years, 21-64 years and  $>$64 years.
-
 \textit{'Our World in Data'} was used to present incidence for all 23 countries (variable: \textit{'new\_cases\_smoothed\_per\_million'}; Supplementary Figure \ref{sf1}).\cite{hasell_cross-country_2020}
-As a sensitivity analysis we separately calculated the incidence for Switzerland.%maybe delete these 3 sentences?
+Additionally, we calculated the incidence for Switzerland.%maybe delete these 3 sentences?
 Therefore, we calculated incidence of confirmed cases for each day including one week, i.e. mean of three days before and after the date of interest.
 The estimated mean of incidence was divided by 8,697,905 (number of Swiss citizens see \href{https://www.worldometers.info/world-population/switzerland-population/}{here}) and multiplied by 100,000.
 
@@ -160,9 +163,10 @@ Secondly, we accounted for cross-border-associated cases and added these to the 
 In these scenarios, cross-border-associated cases were added to each trajectory according to the date of test (Figure \ref{f1}d).
 Cross-border-associated cases were equally likely to transmit, i.e., initiating new branches of local transmission, as all other cases.
 
-The SFOPH reported 3,304 cross-border-associated cases during the study period, but the information on the country of exposure was missing for 10,940 cases, i.e, for 12,259 out of 23,199 (53\%, the extrapolation factor) information was available.
-To capture this uncertainty we considered three different scenarios that account for cross-border-associated cases.
-The most plausible scenario a) considered missing of the country of exposure and the corresponding lack of knowledge about the exact number of cross-border-associated cases as random by using following calculation: reported cross-border-associated cases per day * extrapolation factor.
+The SFOPH reported 3,304 cross-border-associated cases during the study period, but the information on the country of exposure was missing for 10,940 cases.
+For 12,259 out of 23,199 (53\%, the extrapolation factor) information was available.
+To capture the uncertainty of missing information we considered three different scenarios that account for cross-border-associated cases.
+The most plausible scenario a) considered missing of the country of exposure and the corresponding lack of the exact number of cross-border-associated cases as random by using following calculation: reported cross-border-associated cases per day * extrapolation factor.
 In the lower limit scenario b) cross-border cases were less likely among the missing exposure countries by using following calculation: reported cross-border-associated cases per day * extrapolation factor * 2/3.
 Contrary, in the upper limit scenario c) cross-border cases were more likely among the missing exposure countries by using following calculation: reported cross-border-associated cases per day * extrapolation factor * 3/2.
 
@@ -255,7 +259,7 @@ All reported cases &  -  & 23199 &  -  &  -  & 34 (24-50) &  -  \\
 The study population was 34 (interquartile range (IQR): 24-50) years and individuals that had an exposure abroad were 31 (IQR: 23-48) years (Table \ref{t2}).
 Individuals who reported that Switzerland was the only country they had visited within the last 14 days were 35 (IQR: 24-51) years.
 Different age categories were more likely to visit some countries during summer (Table \ref{t2}; Supplementary Figure \ref{sf2}).
-Individuals were significantly younger ($<.05$) if they were exposed to SARS-CoV-2 in France, Croatia, Turkey, Serbia, Greece, Portugal, Albania, Hungary, Poland, Czech Republic, Romania, Slovenia, or the UK compared to individuals that were only in Switzerland.
+Individuals were significantly younger ($<.05$) if they were exposed to SARS-CoV-2 in France, Croatia, Turkey, Serbia, Greece, Portugal, Albania, Hungary, Poland, Czech Republic, Romania, Slovenia, or the UK compared to individuals that were only in Switzerland.%Any idea how I could write this better?
 Contrary, individuals were significantly older ($<.05$) if they were exposed to SARS-CoV-2 in Kosovo, Italy, Germany, Spain, Malta, Austria, North Macedonia, Bosnia and Herzegovina, Netherlands, or in other countries, abroad but unknown, or generally unknown compared to individuals that were only in Switzerland.
 Tendency of crossing borders was similar regarding residency of Swiss cases (Supplementary Figure \ref{sf3}).
 
@@ -277,7 +281,8 @@ The values range from 0 (= no measures) to 100 (= full lockdown).
 c) Daily incidence (blue) and reported cross-border-associated cases (pink).
 d) Three cross-border-associated scenarios a, b, and c that were processed with a branching process model.
 *Official breaks of universities and schools might vary for different subjects and between different schools and cantons, respectively.
-More details on quarantine measures in Table \ref{t2} and \href{https://www.fedlex.admin.ch/eli/cc/2021/61/de}{here}.}
+More details on quarantine measures in Table \ref{t2} and \href{https://www.fedlex.admin.ch/eli/cc/2021/61/de}{here}.
+Abbreviations: COVID-19, coronavirus d}
 \label{f1}
 \end{figure*}
 
@@ -299,7 +304,7 @@ a) Curves represent credible range and median of the cumulative incidence for th
 Dashed lines represent 95\%-CI for the cumulative incidence during 1 June to 30 September 2020.
 b) Curves represent credible range and median of the final incidence for the baseline and three models that accounted for cross-border-associated cases.
 Dashed lines represent 95\%-CI of the incidence on 30 September 2020.
-c) Prior and posterior distribution of $\mathcal{R}_e$ for the baseline and three models that accounted for cross-border-associated cases.
+c) Prior and posterior distribution of $\mathcal{R}_e$ for the baseline scenario and three scenarios that accounted for cross-border-associated cases.
 Abbreviations: $R_e$, the effective reproductive number; CI, credible interval}
 
 \label{f2}
@@ -342,7 +347,7 @@ Consequently, the impact of cross-border-associated cases cannot be ignored to u
 \break
 \par
 Our stochastic branching process model was calibrated to assess the impact of cross-border-associated cases on an epidemiological, i.e. population-based, level.
-For simplicity models described the Swiss epidemic and ignored geographical differences, i.e. cantons.
+For simplicity models described only Swiss epidemic and ignored geographical differences, i.e. cantons.
 %We found hardly evidence that residency was associated with cross-border-associated cases (Supplementary Figure \ref{sf3}).
 Stochastic effects were showed to play an important role in determining parameters in epidemics.\cite{althaus_ebola_2015,riou_pattern_2020}
 Nevertheless, our method has several limitations that need to be addressed.
@@ -350,10 +355,11 @@ We did not account for variations in growth rates, seasonal effect of the SARS-C
 
 Our approach assumed a constant growth rate and $\mathcal{R}_e$ over the summer and ignored immunity, which was acceptable during low prevalence.
 The SFOPH reported 30,883 cases before 1 June and 23,199 more until 30 September 2020.
-However, growth rates, can be calculated for different intervals, e.g., weeks, months, or adjusted for different factors.
+Growth rates, can be calculated for different intervals, e.g., weeks, months, or adjusted for different factors.
 For our study, a constant growth rate and $\mathcal{R}_e$ was more compatible to calculate the overall impact of cross-border-associated cases.
 
-Our study period covered summer months only and thus seasonality had no influence.
+Our study period covered summer months only and the stringency of policy measures was constant after relaxations in June 2020.
+Thus, seasonality had no influence.
 However, people were more active during summer than during winter and probably more optimistic about the pandemic (mostly at the end of summer 2020), which most likely resulted in more physical contacts than before.
 Tracking contact patterns, i.e., behaviour, can give a fast and good assessment of real physical distancing measures.\cite{jarvis_quantifying_2020}
 Unfortunately, contact patterns were missing for this period in Switzerland.
@@ -404,7 +410,7 @@ Our results underline the importance of improved surveillance for (international
 
 
 \section{Acknowledgement}
-We thank the FOPH. Calculations were performed on UBELIX (http://www.id.unibe.ch/hpc), the HPC cluster at the University of Bern.
+We thank the Swiss FOPH (http://www.bag.admin.ch) and the UBELIX team. Calculations were performed on UBELIX (http://www.id.unibe.ch/hpc), the HPC cluster at the University of Bern.
 
 \section{Author contributions}
 MLR, EBH, JR, NAR, and CLR conceived the study and contributed to the analysis of the results.
