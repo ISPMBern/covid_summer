@@ -2,6 +2,7 @@
 Backups/
 data/
 presentations/
+manuscript/
 .DS_Store
 *_data_prep.R
 BAG_data_su2020.csv
