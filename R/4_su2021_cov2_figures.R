@@ -13,6 +13,9 @@ library(reshape2)
 library(scales)
 library(plyr)
 
+# Set seed
+set.seed(60321)
+
 # COVID-19 cases observed in Summer (Jun-Sep) 2020 in Switzerland
 setwd("/Users/mr19m223/Documents/COVID_projects/Epidemic_Su2020/covid_summer/Figures")
 Re_all <- read.csv("../data/Re_all_2022-03-11.csv")
@@ -106,9 +109,18 @@ p_cases <- basic_figplot+
   labs(tag="A",x = "", y =bquote("Confirmed cases"))
 #p_cases_imports_legend <- grid.arrange(grobs = list(basic_figplot,p_cases_imports_legend),layout_matrix =  rbind(1,2))
 
+#Baseline assuming no imports
+#Scenario a) assuming reported imports were representative
+#Scenario b) assuming reported imports were overreported
+#Scenario c) assuming reported imports were underreported
 
-
-labels_prop = factor(c("Scenario a) Missing at random","Scenario b) Lower limit","Scenario c) Upper limit","Reported imports"), levels=c("Scenario a) Missing at random","Scenario b) Lower limit","Scenario c) Upper limit","Reported imports"))
+labels_prop = factor(c("Scenario a) assuming reported imports were representative",
+                       "Scenario b) assuming reported imports were overreported",
+                       "Scenario c) assuming reported imports were underreported",
+                       "Reported imports"), levels=c("Scenario a) assuming reported imports were representative",
+                                                     "Scenario b) assuming reported imports were overreported",
+                                                     "Scenario c) assuming reported imports were underreported",
+                                                     "Reported imports"))
 cols <- col_9[c(8,4,5,1)]
 
 imports_plot <- melt(imports_d, id.vars=c("date","year"))
@@ -164,16 +176,21 @@ for (i in c(2020,2021)) {
   posterior<- simulation_accept[,c("Re","class","imports")]
   posterior$imports <- factor(posterior$imports, levels=unique(posterior$imports)[order(unique(posterior$imports))])
   
-  posterior$imports_name[posterior$imports==levels(posterior$imports)[1]] <- "Baseline"
+  #Baseline assuming no imports
+  #Scenario a) assuming reported imports were representative
+  #Scenario b) assuming reported imports were overreported
+  #Scenario c) assuming reported imports were underreported
+  
+  posterior$imports_name[posterior$imports==levels(posterior$imports)[1]] <- "Baseline assuming no imports"
   posterior$imports_name[posterior$imports==levels(posterior$imports)[2]] <- "Reported imports"
-  posterior$imports_name[posterior$imports==levels(posterior$imports)[3+1]] <- "Scenario a)"
-  posterior$imports_name[posterior$imports==levels(posterior$imports)[2+1]] <- "Scenario b)"
-  posterior$imports_name[posterior$imports==levels(posterior$imports)[4+1]] <- "Scenario c)"
+  posterior$imports_name[posterior$imports==levels(posterior$imports)[3+1]] <- "Scenario a) assuming reported imports were representative"
+  posterior$imports_name[posterior$imports==levels(posterior$imports)[2+1]] <- "Scenario b) assuming reported imports were overreported"
+  posterior$imports_name[posterior$imports==levels(posterior$imports)[4+1]] <- "Scenario c) assuming reported imports were underreported"
   posterior <- posterior[!grepl("Reported imports",posterior$imports_name),]
   posterior$imports <- posterior$imports_name
   posterior$imports_name <- NULL
   prior_posterior <- rbind(prior,posterior)
-  prior_posterior$imports <- factor(prior_posterior$imports, levels=c("Prior distribution","Baseline","Scenario a)","Scenario b)","Scenario c)"))
+  prior_posterior$imports <- factor(prior_posterior$imports, levels=c("Prior distribution","Baseline assuming no imports","Scenario a) assuming reported imports were representative","Scenario b) assuming reported imports were overreported","Scenario c) assuming reported imports were underreported"))
   prior_posterior <- as.data.frame(prior_posterior)
   
   
@@ -196,8 +213,8 @@ for (i in c(2020,2021)) {
 }
 plot_fig2 <- grid.arrange(rbind(ggplotGrob(prior_posterior_2020_plot), ggplotGrob(prior_posterior_2021_plot),size = "last"))
 plot_fig2 <- grid.arrange(grobs = list(plot_fig2,prior_posterior_legend),layout_matrix =  cbind(1,2))
-ggsave(plot_fig2, filename = paste0("Figure2_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 5, width = 10,  bg = "transparent")
-#ggsave(plot_fig2, filename = paste0("Figure2_",format(Sys.time(), "%Y-%m-%d"), ".png"), height = 5, width = 10,  bg = "transparent")
+ggsave(plot_fig2, filename = paste0("Figure3_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 5, width = 10,  bg = "transparent")
+#ggsave(plot_fig2, filename = paste0("Figure3_",format(Sys.time(), "%Y-%m-%d"), ".png"), height = 5, width = 10,  bg = "transparent")
 grid.newpage()
 
 
@@ -234,11 +251,13 @@ for(i in c(2020,2021)){
   import_num <- c(0,colSums(imports_d[,-1]))
   import_num <- import_num[c(1,3,4,5,2)]
 for (I in c(1,2)) {
+  #Baseline assuming no imports
+  #Scenario a) assuming reported imports were representative
   if(I %in% c(1)){
-    tags <- paste0("Baseline for ",i)
+    tags <- paste0("Baseline assuming no imports for ",i)
   }
   else{
-    tags <- paste0("Scenario a) for ",i)
+    tags <- paste0("Scenario a) assuming reported imports were representative for ",i)
   }
   models_output1 <- models_output[models_output$imports ==import_num[I],]
   models_output1$Re <- as.character(models_output1$Re)
@@ -254,9 +273,9 @@ for (I in c(1,2)) {
 
   plots <- basic_figplot +
     geom_line(data=models_output1_accept, aes( x=as_date(date), y=value ,group= variable,color="Accepted trajectories"), alpha=0.8)+
-    stat_summary(data=models_output1_accept,aes(x=as_date(date), y=value), fun=median, geom="line", color=col_9[6],size=2,alpha=0.8)+
+    stat_summary(data=models_output1_accept,aes(x=as_date(date), y=value), fun=median, geom="line", color=col_9[6],size=2,alpha=0.8, linetype="dotted")+
     #stat_summary(data=models_output1_accept,aes(x=as_date(date), y=value), fun=mean, geom="line", color=col_9[9],size=2,alpha=0.8)+
-    geom_line(data=cases_su, aes(x=as_date(date), y = incidence_weigthed* sum(population_bag_ch$population_size)/1e5),color=col_9[2],size=2,alpha=0.8)+
+    geom_line(data=cases_su, aes(x=as_date(date), y = incidence_weigthed* 8544527/1e5),color=col_9[2],size=2,alpha=0.8)+
     scale_x_date(date_breaks = "1 month", 
                  date_labels = "%b")+
     scale_shape_discrete(name="", label="Reported cases")+
@@ -274,9 +293,20 @@ for (I in c(1,2)) {
 }
 }
 
-f3_sim_cases <- grid.arrange(grobs = plots_simulated,layout_matrix =  (matrix(1:4,2,2)))
-ggsave(f3_sim_cases, filename = paste0("Figure3_",format(Sys.time(), "%Y-%m-%d"), ".png"), height = 5, width = 10,  bg = "transparent")
-ggsave(f3_sim_cases, filename = paste0("Figure3_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 5, width = 10,  bg = "transparent")
+# legend:
+legend_d<- data.frame(x=1:20, y=1:20)
+legend_d$g <- as.character(rep(1:2,5))
+legend_d<- basic_figplot +
+  geom_line(data= legend_d, aes(x=x, y = y, group=g, color=g),size=2)+
+  theme(legend.text=element_text(size=10))+
+  scale_color_manual(values=col_9[c(2,6)], name="", labels=c("Weighted incidence of reported cases","Median of simulated trajectories"))
+legend_d <- g_legend(legend_d,1)
+f3_sim_cases <- grid.arrange(grobs = plots_simulated,layout_matrix =  matrix(1:4,2,2))
+
+plot_fig_ls <- grid.arrange(grobs = list(f3_sim_cases,legend_d),layout_matrix =  cbind(rbind(1,1),rbind(1,1),rbind(2,NA)))
+
+ggsave(plot_fig_ls, filename = paste0("Figure2_",format(Sys.time(), "%Y-%m-%d"), ".png"), height = 8, width = 20,  bg = "transparent")
+ggsave(plot_fig_ls, filename = paste0("Figure2_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 10, width = 14,  bg = "transparent")
 grid.newpage()
 
 
@@ -483,7 +513,7 @@ for(i in c(2020,2021)){
       geom_line(data=models_output1_accept, aes( x=as_date(date), y=value ,group= variable,color="Accepted trajectories"), alpha=0.8)+
       stat_summary(data=models_output1_accept,aes(x=as_date(date), y=value), fun=median, geom="line", color=col_9[6],size=2,alpha=0.8)+
       #stat_summary(data=models_output1_accept,aes(x=as_date(date), y=value), fun=mean, geom="line", color=col_9[9],size=2,alpha=0.8)+
-      geom_line(data=cases_su, aes(x=as_date(date), y = incidence_weigthed* sum(population_bag_ch$population_size)/1e5),color=col_9[2],size=2,alpha=0.8)+
+      geom_line(data=cases_su, aes(x=as_date(date), y = incidence_weigthed* 8544527/1e5),color=col_9[2],size=2,alpha=0.8)+
       scale_x_date(date_breaks = "1 month", 
                    date_labels = "%b")+
       scale_shape_discrete(name="", label="Reported cases")+
@@ -505,6 +535,83 @@ sf4_sim_cases <- grid.arrange(grobs = plots_simulated,layout_matrix =  t(rbind(1
 ggsave(sf4_sim_cases, filename = paste0("SF4_",format(Sys.time(), "%Y-%m-%d"), ".png"), height = 20, width = 10,  bg = "transparent")
 ggsave(sf4_sim_cases, filename = paste0("SF4_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 20, width = 10,  bg = "transparent")
 grid.newpage()
+
+
+# per day difference of trajectories to reported incidence (blue line):
+# least square
+for(i in c(2020, 2021)){
+  labels_prop_ls = factor(c("Baseline assuming no imports",
+                            "Scenario a) assuming reported imports were representative",
+                            "Scenario b) assuming reported imports were overreported",
+                            "Scenario c) assuming reported imports were underreported",
+                            "Reported imports"), levels=c("Baseline assuming no imports",
+                                                          "Scenario a) assuming reported imports were representative",
+                                                          "Scenario b) assuming reported imports were overreported",
+                                                          "Scenario c) assuming reported imports were underreported",
+                                                          "Reported imports"))
+  
+  if(i==2020){
+    cases_su <- read.csv("../data/2020/cases_su2020.csv")
+    models_output <- read.csv("../data/2020/models_output2020.csv")
+    #pop_size <- 8606033 #https://www.pxweb.bfs.admin.ch/pxweb/de/px-x-0102020000_103/px-x-0102020000_103/px-x-0102020000_103.px
+    max_y <-1e6
+    }
+  if(i==2021){
+    cases_su <- read.csv("../data/2021/cases_su2021.csv")
+    models_output <- read.csv("../data/2021/models_output2021.csv")
+    #pop_size <- 8670300 #https://www.pxweb.bfs.admin.ch/pxweb/de/px-x-0102020000_103/px-x-0102020000_103/px-x-0102020000_103.px
+    max_y <- 1e8
+    }
+  pop_size <- 8544527
+  
+  models_output <- models_output[models_output$simulation_accepted %in% 1,]
+  
+  models_output_ls<-NA
+  models_output_ls <- data.frame(matrix(NA, ncol = length(unique(models_output$imports)), nrow = 10^5))
+  colnames(models_output_ls)<- unique(models_output$imports)
+  for (j in unique(models_output$imports)) {
+    models_output_j <- models_output[models_output$imports==j,]
+    models_output_j <- as.data.frame(t(models_output_j[9:130]))
+    
+    models_output_j <-as.data.frame(sapply(1:length(models_output_j[1,]), function(x) ((cases_su$incidence_weigthed*(pop_size/1e5) - as.numeric(models_output_j[,x]))^2)))
+    models_output_ls[1:length(models_output_j[1,]),as.character(j)]<- sapply(1:length(models_output_j[1,]), function(x)   sum(models_output_j[,x]))
+  }
+ 
+  models_output_ls_1e3<-as.data.frame(matrix(ncol=5,nrow=1e3))
+  colnames(models_output_ls_1e3) <- colnames(models_output_ls) <- labels_prop_ls
+  unique(models_output$imports)
+  models_output_ls <- models_output_ls[,c(1,3,5,4,2)]
+  for(x in 1:5){
+    models_output_ls_1e3[,x] <- sample(na.omit(models_output_ls[,x]),1e3)
+  }
+  
+  models_output_ls_1e3<- melt(models_output_ls_1e3)
+  cols <- c(col_9[c(7)],col_9[c(8,4,5,1)])
+  ls_plot<- basic_figplot+
+    geom_density(data=models_output_ls_1e3, aes(x=value, fill=variable),color="transparent",alpha=0.5)+
+    scale_fill_manual(values=cols,label= labels_prop_ls, name="") +
+    theme_minimal()+
+    scale_x_continuous(labels = yscaling_log,limits=c(1,max_y))+
+    scale_y_continuous(labels = yscaling_log)+
+    labs(tag=bquote(.("")),subtitle =i, x = bquote(italic("Least squares")), y =bquote("Density"))# bquote(italic("Imports") == .("5050"))
+  ls_legend <- g_legend(ls_plot,1)
+  if(i==2020){
+    ls_plot_2020 <- ls_plot +theme(legend.position="none")
+  }
+  if(i==2021){
+    ls_plot_2021 <- ls_plot+theme(legend.position="none")
+  }
+  
+}
+
+
+plot_fig_ls <- grid.arrange(rbind(ggplotGrob(ls_plot_2020), ggplotGrob(ls_plot_2021)))
+plot_fig_ls <- grid.arrange(grobs = list(plot_fig_ls,ls_legend),layout_matrix =  cbind(1,2))
+ggsave(plot_fig_ls, filename = paste0("SF4_LS_",format(Sys.time(), "%Y-%m-%d"), ".pdf"), height = 5, width = 10,  bg = "transparent")
+ggsave(plot_fig_ls, filename = paste0("SF4_LS_",format(Sys.time(), "%Y-%m-%d"), ".png"), height = 5, width = 10,  bg = "transparent")
+
+
+
 
 #####
 

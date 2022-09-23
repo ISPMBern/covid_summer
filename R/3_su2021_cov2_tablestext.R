@@ -7,7 +7,8 @@ library(xtable)
 library(dplyr)
 # load data
 setwd("/Users/mr19m223/Documents/COVID_projects/Epidemic_Su2020/covid_summer/data")
-
+# Set seed
+set.seed(60321)
 
 cases_summer <- read.csv("cases_su.csv", row.names = 1, header=T, sep=",") 
 cases_summer$year <- year(cases_summer$date)
@@ -28,15 +29,25 @@ colnames(table4) <- c("Year", "Overdispersion parameters", "Import scenario", "R
 for (i in c(2020,2021) ) {
   if(i==2020){
     models_output <- read.csv("./2020/models_output2020.csv")
+    cases_su <- read.csv("../data/2020/cases_su2020.csv", row.names = 1)
+    
   }
   else if(i==2021){
     models_output <- read.csv("./2021/models_output2021.csv")
+    cases_su <- read.csv("../data/2021/cases_su2021.csv", row.names = 1)
+    
   }
   simulation_accept <- models_output[models_output$simulation_accepted==1,]
   print(i)
   print(paste0("All ",length(simulation_accept[,1])))
   
-  import_num <- unique(models_output$imports)
+  imports_d <- cases_su[, c("date","cases_abroad")]
+  weighting <- sum(cases_su$cases_date)/(sum(cases_su$cases_swiss)+sum(cases_su$cases_abroad))
+  imports_d$abroad_a <- round(cases_su$cases_abroad*weighting)
+  imports_d$abroad_b <- round(cases_su$cases_abroad*0.5*weighting)
+  imports_d$abroad_c <- round(cases_su$cases_abroad*1.5*weighting)
+  import_num <- c(0,colSums(imports_d[,-1]))
+  imports_d$date <- as_date(imports_d$date)
   table4$Year <- i
   table4$`Overdispersion parameters` <- c("0.5 (range: 0.49-0.52)")
   table4$`Import scenario` <- c("Baseline scenario", "Confirmed cases exposed abroad","Scenario a)","Scenario b)","Scenario c)")
@@ -230,6 +241,10 @@ for (i in c(2020,2021)) {
   incidence_noswiss$country <-  factor(incidence$location, levels = c( names(country_level)[!names(country_level) %in% c("Switzerland","Others","Unknown")]))
   incidence_noswiss<- incidence_noswiss[!is.na(incidence_noswiss$country),] 
   
+  neighboring_country <- c("France", "Italy", "Germany","Austria")
+  round(sum(BAG_data$country %in% neighboring_country)/sum(!BAG_data$country %in% c("Unknown","Switzerland"))*100,2)
+  round(sum(!BAG_data$country %in% c(neighboring_country,"Unknown","Switzerland"))/sum(!BAG_data$country %in% c("Unknown","Switzerland"))*100,2)
+  
   print(i)
   # for manuscript text
   
@@ -278,8 +293,8 @@ for (i in c(2020,2021)) {
 
 # Age and most likely place of exposure
 ## statistics on age and most likely place of infection using t.test
-setwd("/Users/mr19m223/Documents/COVID_projects/Epidemic_Su2020/covid_summer/table")
-cases_summer <- read.csv("../data/cases_su.csv", row.names = 1, header=T, sep=",") # add file to Ubelix
+setwd("/Users/mr19m223/Documents/COVID_projects/Epidemic_Su2020/covid_summer/data/table")
+cases_summer <- read.csv("../cases_su.csv", row.names = 1, header=T, sep=",") # add file to Ubelix
 cases_summer$year <- year(cases_summer$date)
 
 for (i in c(2020,2021)){
@@ -323,8 +338,74 @@ paste0("Individals that were exposed to SARS-CoV-2 in ",paste0(rownames(age_summ
 paste0("Individuals were significantly younger (<.001) if they were exposed to SARS-CoV-2 in ",paste0(rownames(age_summary)[age_summary$test_pvalue<.001 & age_summary$Estimate < 0],collapse=", ")," compared to individuals that were only in Switzerland.")
 paste0("Individuals were significantly older (<.001) if they were exposed to SARS-CoV-2 in ",paste0(rownames(age_summary)[age_summary$test_pvalue<.001 & age_summary$Estimate > 0],collapse=", ")," compared to individuals that were only in Switzerland.")
 
+cum_final_2021expected <- read.csv("2021/cum_final_2021expected.csv")
+cum_final_2021expected
+cum_final_2020expected <- read.csv("2020/cum_final_2020expected.csv")
+cum_final_2020expected
 
 
 
+# per day difference of trajectories to reported incidence (blue line):
+# least square
+for(i in c(2020, 2021)){
+  labels_prop_ls = factor(c("Baseline assuming no imports",
+                            "Scenario a) assuming reported imports were representative",
+                            "Scenario b) assuming reported imports were overreported",
+                            "Scenario c) assuming reported imports were underreported",
+                            "Reported imports"), levels=c("Baseline assuming no imports",
+                                                          "Scenario a) assuming reported imports were representative",
+                                                          "Scenario b) assuming reported imports were overreported",
+                                                          "Scenario c) assuming reported imports were underreported",
+                                                          "Reported imports"))
+  
+  if(i==2020){
+    cases_su <- read.csv("2020/cases_su2020.csv")
+    models_output <- read.csv("2020/models_output2020.csv")
+    #pop_size <- 8606033 #https://www.pxweb.bfs.admin.ch/pxweb/de/px-x-0102020000_103/px-x-0102020000_103/px-x-0102020000_103.px
+  }
+  if(i==2021){
+    cases_su <- read.csv("2021/cases_su2021.csv")
+    models_output <- read.csv("2021/models_output2021.csv")
+    #pop_size <- 8670300 #https://www.pxweb.bfs.admin.ch/pxweb/de/px-x-0102020000_103/px-x-0102020000_103/px-x-0102020000_103.px
+  }
+  pop_size <- 8544527
+  
+  models_output <- models_output[models_output$simulation_accepted %in% 1,]
+  
+  models_output_ls<-NA
+  models_output_ls <- data.frame(matrix(NA, ncol = length(unique(models_output$imports)), nrow = 10^5))
+  colnames(models_output_ls)<- unique(models_output$imports)
+  for (j in unique(models_output$imports)) {
+    models_output_j <- models_output[models_output$imports==j,]
+    models_output_j <- as.data.frame(t(models_output_j[9:130]))
+    
+    models_output_j <-as.data.frame(sapply(1:length(models_output_j[1,]), function(x) ((cases_su$incidence_weigthed*(pop_size/1e5) - as.numeric(models_output_j[,x]))^2)))
+    models_output_ls[1:length(models_output_j[1,]),as.character(j)]<- sapply(1:length(models_output_j[1,]), function(x)   sum(models_output_j[,x]))
+  }
+  print(i)
+  #print(colnames(models_output_ls))
+ 
+  #print(sapply(1:5, function(x) min(na.omit(models_output_ls[,x]))))
+  #print(min(sapply(1:5, function(x) min(na.omit(models_output_ls[,x])))))
+  
+  #print(sapply(1:5, function(x) length(na.omit(models_output_ls[,x]))))
+  
+  #print(sapply(1:5, function(x) sum(sample(na.omit(models_output_ls[,x]),1e3))))
+  #print(min(sapply(1:5, function(x) min(sum(sample(na.omit(models_output_ls[,x]),1e3))))))
+  
+  #print(sapply(1:5, function(x) mean(sample(na.omit(models_output_ls[,x]),1e3))))
+  #print(min(sapply(1:5, function(x) min(mean(sample(na.omit(models_output_ls[,x]),1e3))))))
+  
+  
+  colnames(models_output_ls) <- labels_prop_ls
+  
+  
+  print(sapply(1:5, function(x) median(sample(na.omit(models_output_ls[,x]),1e3))))
+  #print(min(sapply(1:5, function(x) min(median(sample(na.omit(models_output_ls[,x]),1e3))))))
+  
+  print(paste(colnames(models_output_ls[order(sapply(1:5, function(x) (median(sample(na.omit(models_output_ls[,x]),1e3)))))]), collapse="; "))
+  
+  
+}
 
 

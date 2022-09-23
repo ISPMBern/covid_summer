@@ -25,6 +25,7 @@ GET(url, write_disk(tf <- tempfile(fileext = ".xls")))
 population_bag_ch <- read.xlsx(tf,sheetIndex = 2, startRow = 0)
 population_bag_ch <- population_bag_ch[population_bag_ch$Kanton !="FL",]
 colnames(population_bag_ch) <- c("canton", "gender", "age", "population_size")
+pop_size <- 8544527
 
 # get data from KOF (ETHZ): Stringency Index
 KOF <- read.csv(paste0("https://datenservice.kof.ethz.ch/api/v1/public/sets/stringency_plus_web?mime=csv&df=Y-m-d.csv"))
@@ -226,12 +227,13 @@ for (i in c("2020","2021")) {
   #sum(imports_d$cases_abroad)
   
   # Estimating incidence
-  cases_su$incidence <- cases_su$cases_date/sum(population_bag_ch$population_size)*1e5 #https://www.worldometers.info/world-population/switzerland-population/
+  #cases_su$incidence <- cases_su$cases_date/sum(population_bag_ch$population_size)*1e5 #https://www.worldometers.info/world-population/switzerland-population/
+  cases_su$incidence <- cases_su$cases_date/pop_size*1e5 #https://www.worldometers.info/world-population/switzerland-population/
   before <- 3
   after <- 3
   incidence_fun <- function(x){
     set <- subset(cases_su, cases_su$date >= (as_date(x) - before) & cases_su$date <= (as_date(x) + after))
-    incidence_weigthed<- mean(set$cases_date)/sum(population_bag_ch$population_size)*1e5
+    incidence_weigthed<- mean(set$cases_date)/pop_size*1e5
     return(incidence_weigthed)
   }
   cases_su$incidence_weigthed <- sapply(cases_su$date, incidence_fun)
@@ -281,7 +283,7 @@ for (i in c("2020","2021")) {
   models_output$final_incidence <- as.numeric(models_output$final_incidence)
   models_output$simulation_accepted <- 0
   models_output$simulation_accepted[models_output$cum_cases %in% cum_expected_seq & models_output$final_incidence %in% final_expected_seq] <-1
-  simulation_accept <- models_output[models_output$simulation_accepted==1,]
+  simulation_accept <- models_output[models_output$simulation_accepted%in%1,]
   
   print(i)
   print(paste0("All ",length(simulation_accept[,1])))

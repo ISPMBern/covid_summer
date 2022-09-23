@@ -5,6 +5,8 @@
 #library
 library(MASS)
 library(lubridate)
+# Set seed
+set.seed(60321)
 
 
 # Sensitivity analysis using k=0.1 and =1:
@@ -21,7 +23,7 @@ Re_all <- read.csv("../Re_all_2022-03-11.csv")
 imports <- list.files( pattern="import_model_*", full.names=TRUE, recursive=FALSE)
 #noimports <- imports[grepl("sensitivity_*", imports)]
 #imports <- imports[!grepl("sensitivity_*", imports)]
-
+probs = c(.025,.5,.975)
 
 
 for(i in c(2020, 2021)){
