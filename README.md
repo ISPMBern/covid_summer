@@ -2,7 +2,8 @@
 #### Background
 During the summers of 2020 and 2021, the number of confirmed cases of severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) infections in Switzerland remained at relatively low levels, but grew steadily over time. It remains unclear to what extent epidemic growth during these periods was a result of the relaxation of local control measures or increased traveling and subsequent importation of cases. A better understanding of the role of cross-border-associated cases (imports) on the local epidemic dynamics will help to inform future surveillance strategies.
 
-#### Aim To quantify the impact of imports on the SARS-CoV-2 epidemic trends in Switzerland during summer periods.
+#### Aim 
+To quantify the impact of imports on the SARS-CoV-2 epidemic trends in Switzerland during summer periods.
 
 #### Methods
 We analyzed routine surveillance data of confirmed cases of SARS-CoV-2 in Switzerland from 1 June to 30 September 2020 and 2021. We used a stochastic branching process model that accounts for superspreading of SARS-CoV-2 to simulate epidemic trajectories in absence and in presence of imports during summer 2020 and 2021.

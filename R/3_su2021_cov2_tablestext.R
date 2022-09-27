@@ -346,18 +346,16 @@ cum_final_2020expected
 
 
 # per day difference of trajectories to reported incidence (blue line):
-# least square
+#  square errors
 for(i in c(2020, 2021)){
-  labels_prop_ls = factor(c("Baseline assuming no imports",
+  labels_prop_ls = factor(c("Baseline assuming no imports","Reported imports",
                             "Scenario a) assuming reported imports were representative",
-                            "Scenario b) assuming reported imports were overreported",
-                            "Scenario c) assuming reported imports were underreported",
-                            "Reported imports"), levels=c("Baseline assuming no imports",
-                                                          "Scenario a) assuming reported imports were representative",
-                                                          "Scenario b) assuming reported imports were overreported",
-                                                          "Scenario c) assuming reported imports were underreported",
-                                                          "Reported imports"))
-  
+                            "Scenario c) ‘upper limit’ that assumed more imports among cases with missing information",
+                          "Scenario b) ‘lower limit’ that assumed fewer imports among cases with missing information"),
+                          levels=c(c("Baseline assuming no imports","Reported imports",
+                                     "Scenario a) assuming reported imports were representative",
+                                     "Scenario c) ‘upper limit’ that assumed more imports among cases with missing information",
+                                     "Scenario b) ‘lower limit’ that assumed fewer imports among cases with missing information")))
   if(i==2020){
     cases_su <- read.csv("2020/cases_su2020.csv")
     models_output <- read.csv("2020/models_output2020.csv")
@@ -395,16 +393,30 @@ for(i in c(2020, 2021)){
   
   #print(sapply(1:5, function(x) mean(sample(na.omit(models_output_ls[,x]),1e3))))
   #print(min(sapply(1:5, function(x) min(mean(sample(na.omit(models_output_ls[,x]),1e3))))))
+
   
-  
-  colnames(models_output_ls) <- labels_prop_ls
   
   
   print(sapply(1:5, function(x) median(sample(na.omit(models_output_ls[,x]),1e3))))
+  print(sapply(1:5, function(x) quantile(sample(na.omit(models_output_ls[,x]),1e3))))
+  iqr_prob <- c(.25,.5,.75)
+  models_output_ls_1e3 <- sapply(1:5, function(x)sample(na.omit(models_output_ls[,x]),1e3))
+  colnames(models_output_ls_1e3) <- labels_prop_ls
+  
   #print(min(sapply(1:5, function(x) min(median(sample(na.omit(models_output_ls[,x]),1e3))))))
+  square_error <- sapply(1:5, function(x) as.numeric(sqrt(quantile(models_output_ls_1e3[,x],iqr_prob))))
+  square_error <- rbind(square_error, sapply(1:5, function(x) as.numeric(sqrt(mean(models_output_ls_1e3[,x])))))
   
-  print(paste(colnames(models_output_ls[order(sapply(1:5, function(x) (median(sample(na.omit(models_output_ls[,x]),1e3)))))]), collapse="; "))
-  
+  square_error <- rbind(square_error, sapply(1:5, function(x) as.numeric(sd(sqrt(models_output_ls_1e3[,x])))))
+  colnames(square_error) <- colnames(models_output_ls_1e3)
+square_error <- rbind(square_error,paste0(formatC(round(as.numeric(square_error[2,])), format="d", big.mark=","), " (IQR: ",formatC(round(square_error[1,]), format="d", big.mark=","),"-",formatC(round(square_error[3,]), format="d", big.mark=","),")"))
+square_error <- rbind(square_error,paste0(formatC(round(as.numeric(square_error[4,])), format="d", big.mark=","), " (sd: ",formatC(round(as.numeric(square_error[5,])), format="d", big.mark=","),")"))
+square_error <- square_error[,order(as.numeric(square_error[4,]))]
+
+  #print(square_error[4,])
+  print(paste0("For ",i,", the RMSE was minimal to the daily incidence of confirmed cases (7-day moving average) for ",paste0(colnames(square_error)," ",square_error[7,],collapse = ", followed by ")))
+  #print(sapply(1:5, function(x) quantile(sample(na.omit(models_output_ls[,x]),1e3),probs))[,order(sapply(1:5, function(x) mean(sample(na.omit(models_output_ls[,x]),1e3))))])
+ 
   
 }
 
