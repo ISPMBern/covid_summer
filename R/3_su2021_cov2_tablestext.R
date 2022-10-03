@@ -410,11 +410,11 @@ for(i in c(2020, 2021)){
   square_error <- rbind(square_error, sapply(1:5, function(x) as.numeric(sd(sqrt(models_output_ls_1e3[,x])))))
   colnames(square_error) <- colnames(models_output_ls_1e3)
 square_error <- rbind(square_error,paste0(formatC(round(as.numeric(square_error[2,])), format="d", big.mark=","), " (IQR: ",formatC(round(square_error[1,]), format="d", big.mark=","),"-",formatC(round(square_error[3,]), format="d", big.mark=","),")"))
-square_error <- rbind(square_error,paste0(formatC(round(as.numeric(square_error[4,])), format="d", big.mark=","), " (sd: ",formatC(round(as.numeric(square_error[5,])), format="d", big.mark=","),")"))
+square_error <- rbind(square_error,paste0(formatC(round(as.numeric(square_error[4,])), format="d", big.mark=",")))#, " (sd: ",formatC(round(as.numeric(square_error[5,])), format="d", big.mark=","),")"))
 square_error <- square_error[,order(as.numeric(square_error[4,]))]
 
   #print(square_error[4,])
-  print(paste0("For ",i,", the RMSE was minimal to the daily incidence of confirmed cases (7-day moving average) for ",paste0(colnames(square_error)," ",square_error[7,],collapse = ", followed by ")))
+  print(paste0("For ",i,", the RMSE was minimal to the daily incidence of confirmed cases (7-day moving average) for ",paste0(colnames(square_error)," with a value of ",square_error[7,],collapse = ", followed by ")))
   #print(sapply(1:5, function(x) quantile(sample(na.omit(models_output_ls[,x]),1e3),probs))[,order(sapply(1:5, function(x) mean(sample(na.omit(models_output_ls[,x]),1e3))))])
  
   
