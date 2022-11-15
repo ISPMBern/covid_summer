@@ -531,12 +531,12 @@ for(i in c(2020,2021)){
       models_output1_accept$date <- cases_su$date
       models_output1_accept<- melt(models_output1_accept, id.vars="date")
     }
-    cols <- col_9[c(7,8,4,5,1)]
+    cols <- col_9[c(7,8,5,4,1)]
     cols <- cols[c(I)]
     
     plots <- basic_figplot +
       geom_line(data=models_output1_accept, aes( x=as_date(date), y=value ,group= variable,color="Accepted trajectories"), alpha=0.8)+
-      stat_summary(data=models_output1_accept,aes(x=as_date(date), y=value), fun=median, geom="line", color=col_9[6],size=2,alpha=0.8)+
+      stat_summary(data=models_output1_accept,aes(x=as_date(date), y=value), fun=median, geom="line", color=col_9[6],size=2,alpha=0.8, linetype="dotted")+
       #stat_summary(data=models_output1_accept,aes(x=as_date(date), y=value), fun=mean, geom="line", color=col_9[9],size=2,alpha=0.8)+
       geom_line(data=cases_su, aes(x=as_date(date), y = incidence_weigthed* 8544527/1e5),color=col_9[2],size=2,alpha=0.8)+
       scale_x_date(date_breaks = "1 month", 
