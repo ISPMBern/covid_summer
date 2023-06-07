@@ -1,6 +1,8 @@
 # Impact of cross-border-associated cases on the SARS-CoV-2 epidemic in Switzerland during summer 2020 and 2021
 
-> Reichmuth ML, Hodcroft EB, Riou J, Neher RA, Hens N, Althaus CL. [Impact of cross-border-associated cases on the SARS-CoV-2 epidemic in Switzerland during summer 2020 and 2021](https://doi.org/10.1016/j.epidem.2022.100654). **Epidemics**. 2022;41:100654.
+This repository contains `R` code for the following publication:
+
+> Reichmuth ML, Hodcroft EB, Riou J, Neher RA, Hens N, Althaus CL. Impact of cross-border-associated cases on the SARS-CoV-2 epidemic in Switzerland during summer 2020 and 2021. *Epidemics*. 2022;41:100654. [doi:10.1016/j.epidem.2022.100654](https://doi.org/10.1016/j.epidem.2022.100654)
 
 ## Abstract
 
